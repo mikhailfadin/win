@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Мои победы</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Победы">
 <meta name="theme-color" content="#fdfbf0">
 <link rel="apple-touch-icon" href="icon.png">
@@ -32,11 +31,15 @@ body{
 b,strong,h1,.bold{font-family:'Balsamiq Sans',sans-serif;font-weight:700}
 
 /* ── строка входа ── */
-.authbar{display:flex;align-items:center;justify-content:center;gap:9px;font-size:13px;color:var(--soft);
-         min-height:22px;flex-wrap:wrap}
-.authbar button{font-family:'Balsamiq Sans',Balsamiq,sans-serif;font-size:13px;cursor:pointer;
-                border:2px solid var(--hair);border-radius:16px;padding:4px 13px;background:#fff;color:var(--ink)}
-.authbar button:hover{border-color:var(--soft)}
+.authbar{display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;color:var(--ink);
+         flex-wrap:wrap;background:#fff6d8;border:2px solid var(--sun2);border-radius:18px;
+         padding:9px 14px;margin-bottom:2px}
+.authbar.in{background:#eefaf1;border-color:#9ad9ae;font-size:13px;padding:7px 13px}
+.authbar button{font-family:'Balsamiq Sans',Balsamiq,sans-serif;font-size:14px;font-weight:700;cursor:pointer;
+                border:2px solid var(--ink);border-radius:16px;padding:6px 15px;
+                background:linear-gradient(180deg,#ffe066,#ffc400);color:var(--ink)}
+.authbar button:hover{transform:translateY(-1px)}
+.authbar.in button{background:#fff;border-color:var(--hair);font-weight:400;font-size:12.5px;padding:4px 12px}
 .authbar .dot{width:7px;height:7px;border-radius:50%;background:#22b455;flex:none}
 .authbar .dot.off{background:#c9c7bb}
 .authbar input{width:210px;padding:6px 11px;font-size:13px;border-radius:14px;border:2px solid var(--hair)}
@@ -579,12 +582,14 @@ function paintAuth(){
   if (!bar) return;
   if (typeof user !== 'undefined' && user) {
     const pending = wins.filter(w => !w.synced).length;
+    bar.className = 'authbar in';
     bar.innerHTML = `<span class="dot"></span>${user.email}
       ${syncing ? '<span>синхронизация…</span>' : (pending ? `<span>ждут отправки: ${pending}</span>` : '<span>всё сохранено</span>')}
       <button id="outbtn">выйти</button>`;
   } else {
-    bar.innerHTML = `<span class="dot off"></span><span>победы только на этом устройстве</span>
-      <button id="inbtn">войти и синхронизировать</button>`;
+    bar.className = 'authbar';
+    bar.innerHTML = `<span>⭐ Победы пока только на этом устройстве</span>
+      <button id="inbtn">Войти и синхронизировать</button>`;
   }
 }
 
