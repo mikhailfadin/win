@@ -608,9 +608,25 @@ document.addEventListener('click', async e => {
     const bar = document.getElementById('authbar');
     bar.innerHTML = '<span>отправляю…</span>';
     const { error } = await signIn(mail);
-    bar.innerHTML = error
-      ? `<span style="color:#e63946">не вышло: ${error.message}</span><button id="inbtn">ещё раз</button>`
-      : `<span class="msg">письмо ушло на ${mail} — открой ссылку из него</span>`;
+    if (error) {
+      const m = String(error.message || '');
+      let txt = m, hint = '';
+      const wait = m.match(/after (\d+) seconds/);
+      if (wait) {
+        txt = `Письмо уже отправлено. Следующее можно запросить через ${wait[1]} сек.`;
+        hint = 'Проще: открой письмо, которое уже пришло, прямо на этом устройстве — ссылка сработает здесь.';
+      } else if (/invalid|email/i.test(m)) {
+        txt = 'Почта введена с ошибкой — проверь адрес.';
+      } else if (/rate|limit/i.test(m)) {
+        txt = 'Слишком много запросов подряд. Подожди минуту.';
+      }
+      bar.innerHTML = `<span style="color:#e63946">${txt}</span>
+        ${hint ? `<span style="color:var(--soft);font-size:12.5px">${hint}</span>` : ''}
+        <button id="inbtn">ещё раз</button>`;
+    } else {
+      bar.innerHTML = `<span class="msg">Письмо ушло на ${mail}. Открой его и нажми ссылку внутри —
+        именно на том устройстве, где хочешь войти.</span>`;
+    }
     return;
   }
   if (e.target.id === 'outbtn') { await signOut(); paintAuth(); render(); }
