@@ -3,15 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Мои победы</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Победы">
-<meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#fdfbf0">
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.json">
-<title>Мои победы</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans:wght@400;700&display=swap">
 <style>
 :root{color-scheme:light}
@@ -31,6 +30,17 @@ body{
   display:flex; flex-direction:column; gap:16px;
 }
 b,strong,h1,.bold{font-family:'Balsamiq Sans',sans-serif;font-weight:700}
+
+/* ── строка входа ── */
+.authbar{display:flex;align-items:center;justify-content:center;gap:9px;font-size:13px;color:var(--soft);
+         min-height:22px;flex-wrap:wrap}
+.authbar button{font-family:'Balsamiq Sans',Balsamiq,sans-serif;font-size:13px;cursor:pointer;
+                border:2px solid var(--hair);border-radius:16px;padding:4px 13px;background:#fff;color:var(--ink)}
+.authbar button:hover{border-color:var(--soft)}
+.authbar .dot{width:7px;height:7px;border-radius:50%;background:#22b455;flex:none}
+.authbar .dot.off{background:#c9c7bb}
+.authbar input{width:210px;padding:6px 11px;font-size:13px;border-radius:14px;border:2px solid var(--hair)}
+.authbar .msg{color:#22b455}
 
 /* ── шапка ── */
 .top{display:flex;flex-direction:column;align-items:center;gap:3px}
@@ -222,8 +232,12 @@ input::placeholder{color:var(--soft)}
 
 
 </style>
+</head>
+<body>
 
 <div class="app">
+
+  <div class="authbar" id="authbar"></div>
 
   <div class="top">
     <div class="title">
@@ -316,6 +330,8 @@ function read(k, fb){ try { const v = JSON.parse(localStorage.getItem(k)||'null'
 function save(){ try { localStorage.setItem('pobedy_v3', JSON.stringify(wins)); } catch(e){} }
 function seed(){
   const d = n => { const x = new Date(); x.setDate(x.getDate()-n); return x.toISOString(); };
+  const mk = (t,s,dd,sup) => ({id:(typeof uid==='function'?uid():String(Math.random())),
+                               t, s, d:dd, super:!!sup, synced:false});
   return [
     {t:'Сделал зарядку и растяжку, впервые за две недели', s:'здоровье', d:d(0)},
     {t:'Тренировка в зале — жим 80 кг', s:'спорт', d:d(0)},
@@ -451,6 +467,7 @@ function render(){
   document.getElementById('superbtn').style.display = solo && !open ? '' : 'none';
   document.getElementById('cats').style.display     = solo ? '' : 'none';
   document.getElementById('calbtn').style.display   = open ? 'none' : '';
+  if (typeof paintAuth === 'function') paintAuth();
   justAdded = null;
 }
 
@@ -481,15 +498,20 @@ function closeComposer(){
 function commit(){
   const t=document.getElementById('draft').value.trim();
   if(!t){ closeComposer(); return; }
-  if(editing!==null){ wins[editing].t=t; wins[editing].s=picked; }
+  if(editing!==null){
+    wins[editing].t=t; wins[editing].s=picked; wins[editing].synced=false;
+    if (typeof pushWin==='function') pushWin(wins[editing]);
+  }
   else {
     // пишем в выбранный день, время берём текущее
     const now = new Date();
     const when = new Date(anchor);
     when.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
-    const rec={t, s:picked, d:when.toISOString()};
+    const rec={id:(typeof uid==='function'?uid():String(Date.now())),
+               t, s:picked, d:when.toISOString(), synced:false};
     if(superMode) rec.super=true;
     wins.push(rec); justAdded=rec.d;
+    if (typeof pushWin==='function') pushWin(rec);
     period=0;                      // остаёмся на выбранной дате
   }
   save(); closeComposer();
@@ -525,7 +547,12 @@ document.addEventListener('click', e=>{
   if(e.target.closest('#superbtn')){ editing=null; openComposer('',null,true); return; }
   if(e.target.id==='save') commit();
   if(e.target.id==='cancel') closeComposer();
-  if(e.target.id==='remove' && editing!==null){ wins.splice(editing,1); save(); closeComposer(); return; }
+  if(e.target.id==='remove' && editing!==null){
+    const gone = wins[editing];
+    wins.splice(editing,1); save();
+    if (typeof deleteWin==='function' && gone && gone.id) deleteWin(gone.id);
+    closeComposer(); return;
+  }
   if(e.target.closest('#calbtn')){ calMonth=new Date(anchor); document.getElementById('veil').classList.add('on'); renderCal(); return; }
   if(e.target.id==='mclose' || e.target.id==='veil'){ document.getElementById('veil').classList.remove('on'); return; }
   if(e.target.closest('#mprev')){ calMonth.setMonth(calMonth.getMonth()-1); renderCal(); return; }
@@ -544,7 +571,48 @@ document.getElementById('next').onclick=()=>{ anchor.setDate(anchor.getDate()+PE
 
 render();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="sync.js"></script>
+<script>
+function paintAuth(){
+  const bar = document.getElementById('authbar');
+  if (!bar) return;
+  if (typeof user !== 'undefined' && user) {
+    const pending = wins.filter(w => !w.synced).length;
+    bar.innerHTML = `<span class="dot"></span>${user.email}
+      ${syncing ? '<span>синхронизация…</span>' : (pending ? `<span>ждут отправки: ${pending}</span>` : '<span>всё сохранено</span>')}
+      <button id="outbtn">выйти</button>`;
+  } else {
+    bar.innerHTML = `<span class="dot off"></span><span>победы только на этом устройстве</span>
+      <button id="inbtn">войти и синхронизировать</button>`;
+  }
+}
 
+document.addEventListener('click', async e => {
+  if (e.target.id === 'inbtn') {
+    const bar = document.getElementById('authbar');
+    bar.innerHTML = `<input id="mail" type="email" placeholder="почта" autocomplete="email">
+      <button id="sendlink">прислать ссылку</button><button id="cancelin">отмена</button>`;
+    document.getElementById('mail').focus();
+    return;
+  }
+  if (e.target.id === 'cancelin') { paintAuth(); return; }
+  if (e.target.id === 'sendlink') {
+    const mail = (document.getElementById('mail').value || '').trim();
+    if (!mail) return;
+    const bar = document.getElementById('authbar');
+    bar.innerHTML = '<span>отправляю…</span>';
+    const { error } = await signIn(mail);
+    bar.innerHTML = error
+      ? `<span style="color:#e63946">не вышло: ${error.message}</span><button id="inbtn">ещё раз</button>`
+      : `<span class="msg">письмо ушло на ${mail} — открой ссылку из него</span>`;
+    return;
+  }
+  if (e.target.id === 'outbtn') { await signOut(); paintAuth(); render(); }
+});
+
+if (window.supabase) initCloud();
+</script>
 
 </body>
 </html>
