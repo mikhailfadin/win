@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Победы">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#fdfbf0">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png">
+<link rel="manifest" href="manifest.json">
+<title>Мои победы</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans:wght@400;700&display=swap">
+<style>
+:root{color-scheme:light}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --paper:#fdfbf0; --ink:#2b2b2b; --soft:#8d8d86; --hair:#c9c7bb;
+  --sun:#ffd93d; --sun2:#ffc400;
+}
+body{
+  background:#eceadd; min-height:100vh; display:flex; justify-content:center;
+  padding:22px 14px 40px; font-family:'Balsamiq Sans',-apple-system,BlinkMacSystemFont,sans-serif; color:var(--ink);
+}
+.app{
+  width:900px; max-width:100%; background:var(--paper); border-radius:26px;
+  padding:26px 30px 30px; box-shadow:0 20px 54px rgba(0,0,0,.18);
+  display:flex; flex-direction:column; gap:16px;
+}
+b,strong,h1,.bold{font-family:'Balsamiq Sans',sans-serif;font-weight:700}
+
+/* ── шапка ── */
+.top{display:flex;flex-direction:column;align-items:center;gap:3px}
+.title{display:flex;align-items:center;gap:14px}
+.title svg{width:34px;height:34px;flex:none}
+h1{font-size:44px;line-height:1.05;letter-spacing:.5px}
+.count{font-size:21px;color:var(--soft);margin-top:1px}
+.count em{font-style:normal;color:var(--ink);font-family:'Balsamiq Sans'}
+.datebar{display:flex;align-items:center;gap:14px;margin-top:5px}
+.datebar b{font-size:19px}
+.arw{width:34px;height:34px;display:grid;place-items:center;cursor:pointer;color:var(--soft);
+     font-size:23px;border-radius:50%;user-select:none;line-height:1}
+.arw:hover{background:#f0eee0;color:var(--ink)}
+.arw.off{opacity:.22;pointer-events:none}
+
+/* ── поле звёзд ── */
+.field{padding:6px 0 2px}
+.dayline{display:flex;align-items:center;gap:11px;margin:14px 0 10px}
+.dayline span{font-size:14px;color:var(--soft);white-space:nowrap}
+.dayline i{flex:1;height:2px;background:var(--hair);border-radius:2px}
+.dayline b{font-size:16px}
+.stars{display:grid;grid-template-columns:repeat(5,1fr);gap:10px 12px;
+       grid-auto-rows:146px;justify-items:center;align-items:start}
+.slot{width:100%;max-width:130px;height:146px;display:flex;flex-direction:column;
+      align-items:center;gap:6px;position:relative}
+.slot svg{width:88px;height:88px;overflow:visible}
+.slot.super svg{width:104px;height:104px;margin:-8px 0}
+.slot.done{cursor:pointer}
+.slot.done:hover svg{transform:scale(1.07) rotate(-3deg);transition:.16s}
+.slot.pop svg{animation:pop .5s cubic-bezier(.3,1.5,.5,1)}
+@keyframes pop{0%{transform:scale(.2) rotate(-25deg);opacity:0}100%{transform:none;opacity:1}}
+.cap{
+  font-size:13.5px;line-height:1.25;text-align:center;color:var(--ink);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  height:36px;width:100%;
+}
+.slot.done:hover .cap{
+  position:absolute;top:92px;left:-14px;right:-14px;z-index:9;
+  -webkit-line-clamp:unset;height:auto;background:#fff;
+  border:2px solid var(--hair);border-radius:12px;padding:8px 10px;
+  box-shadow:0 8px 20px rgba(0,0,0,.14);
+}
+.empty svg{opacity:.85}
+
+/* ── категории ── */
+.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:6px}
+.cat{
+  display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;
+  border:2.5px solid var(--hair);border-radius:26px;padding:11px 6px;font-size:15.5px;
+  background:#fff;transition:.14s;
+}
+.cat svg{width:21px;height:21px;flex:none}
+.cat:hover{transform:translateY(-1px)}
+.cat.on{background:#fff;box-shadow:0 4px 0 rgba(0,0,0,.07)}
+
+/* ── кнопки ── */
+.btns{display:flex;flex-direction:column;gap:10px;align-items:center;margin-top:4px}
+.row2{display:contents}
+.big{
+  width:100%;border:3px solid var(--ink);border-radius:30px;cursor:pointer;font-family:'Balsamiq Sans';
+  background:linear-gradient(180deg,#ffe066,#ffc400);color:var(--ink);font-size:26px;
+  padding:15px;display:flex;align-items:center;justify-content:center;gap:13px;
+  box-shadow:0 5px 0 rgba(0,0,0,.16);transition:.12s;
+}
+.big:hover{transform:translateY(-2px);box-shadow:0 7px 0 rgba(0,0,0,.16)}
+.big:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.16)}
+.mid{
+  width:74%;border:2.5px solid var(--sun2);border-radius:26px;cursor:pointer;font-family:'Balsamiq Sans';
+  background:#fffbe8;color:var(--ink);font-size:19px;padding:11px;
+  display:flex;align-items:center;justify-content:center;gap:10px;transition:.12s;
+}
+.mid:hover{background:#fff6d0}
+.small{
+  border:2.5px solid var(--hair);border-radius:24px;cursor:pointer;font-family:'Balsamiq Sans';
+  background:#fff;color:var(--ink);font-size:17px;padding:9px 26px;
+  display:flex;align-items:center;justify-content:center;gap:9px;transition:.12s;
+}
+.small:hover{border-color:var(--soft)}
+.big svg,.mid svg,.small svg{width:26px;height:26px;flex:none}
+.mid svg{width:24px;height:24px}
+.small svg{width:20px;height:20px}
+
+/* ── ввод ── */
+.composer{display:none;flex-direction:column;gap:11px}
+.composer.on{display:flex}
+input{
+  width:100%;background:#fff;border:2.5px solid var(--hair);border-radius:18px;
+  padding:15px 18px;font-size:19px;font-family:'Balsamiq Sans';color:var(--ink);outline:none;
+}
+input:focus{border-color:var(--sun2)}
+input::placeholder{color:var(--soft)}
+.crow{display:flex;gap:10px}
+.crow button{flex:1;padding:12px;border-radius:20px;cursor:pointer;font-family:'Balsamiq Sans';
+             font-size:17px;border:2.5px solid var(--ink)}
+.crow .ok{background:linear-gradient(180deg,#ffe066,#ffc400)}
+.crow .no{background:#fff;border-color:var(--hair);color:var(--soft)}
+.crow .del{background:#fff;border-color:#f2a49d;color:#d9503f;flex:0 0 auto;padding:12px 20px}
+
+/* ── календарь ── */
+.veil{position:fixed;inset:0;background:rgba(40,38,30,.42);display:none;
+      align-items:center;justify-content:center;padding:20px;z-index:50}
+.veil.on{display:flex}
+.modal{background:var(--paper);border-radius:24px;padding:24px;width:420px;max-width:100%;
+       box-shadow:0 22px 50px rgba(0,0,0,.3)}
+.mhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.mhead b{font-size:22px}
+.seg{display:flex;gap:8px;margin-bottom:16px}
+.seg span{flex:1;text-align:center;padding:9px 0;border:2.5px solid var(--hair);border-radius:20px;
+          font-size:16px;cursor:pointer;background:#fff}
+.seg span.on{background:linear-gradient(180deg,#ffe066,#ffc400);border-color:var(--ink)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cal .wd{text-align:center;font-size:12px;color:var(--soft);padding-bottom:4px}
+.cal .d{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+        border-radius:12px;cursor:pointer;font-size:15px;border:2px solid transparent;position:relative}
+.cal .d:hover{background:#f2f0e2}
+.cal .d.out{opacity:.25;pointer-events:none}
+.cal .d.today{border-color:var(--hair)}
+.cal .d.sel{background:linear-gradient(180deg,#ffe066,#ffc400);border-color:var(--ink)}
+.cal .d i{font-style:normal;font-size:10px;color:var(--soft);margin-top:1px}
+.cal .d.sel i{color:var(--ink)}
+.mclose{width:100%;margin-top:16px;padding:11px;border:2.5px solid var(--ink);border-radius:22px;
+        background:#fff;font-family:'Balsamiq Sans';font-size:17px;cursor:pointer}
+
+@media (max-width:760px){
+  body{padding:0;background:var(--paper);align-items:stretch}
+  .app{
+    width:100%;max-width:100%;border-radius:0;box-shadow:none;
+    min-height:100vh;min-height:100dvh;gap:11px;
+    padding:calc(12px + env(safe-area-inset-top)) 12px calc(14px + env(safe-area-inset-bottom));
+  }
+
+  /* шапка компактнее */
+  .title{gap:9px}
+  .title svg{width:24px;height:24px}
+  h1{font-size:30px}
+  .count{font-size:16px}
+  .datebar{gap:8px;margin-top:3px}
+  .datebar b{font-size:16px}
+  .arw{width:40px;height:36px;font-size:22px}
+
+  /* звёзды: те же пять в ряд, все 20 на экране */
+  .field{padding:2px 0 0}
+  .stars{grid-template-columns:repeat(5,1fr);gap:4px 4px;grid-auto-rows:96px}
+  .slot{max-width:none;height:96px;gap:2px}
+  .slot svg{width:58px;height:58px}
+  .slot.super svg{width:68px;height:68px;margin:-5px 0}
+  .cap{font-size:10px;line-height:1.15;height:24px;-webkit-line-clamp:2}
+  .slot.done:hover .cap,.slot.done:active .cap{
+    position:absolute;top:60px;left:-18px;right:-18px;z-index:9;
+    -webkit-line-clamp:unset;height:auto;font-size:12px;
+    background:#fff;border:2px solid var(--hair);border-radius:10px;padding:7px 8px;
+    box-shadow:0 8px 18px rgba(0,0,0,.16);
+  }
+  .dayline{margin:10px 0 7px}
+  .dayline span{font-size:12px}
+
+  /* категории — 4 в ряд, компактные */
+  .cats{grid-template-columns:repeat(4,1fr);gap:6px;margin-top:2px}
+  .cat{padding:9px 3px;font-size:12px;gap:5px;border-width:2px;border-radius:20px}
+  .cat svg{width:16px;height:16px}
+
+  /* кнопки: главная во всю ширину, две другие в ряд */
+  .btns{gap:8px;margin-top:2px}
+  .big{font-size:20px;padding:13px;border-radius:24px;border-width:2.5px;gap:9px}
+  .big svg{width:22px;height:22px}
+  .row2{display:flex;gap:8px;width:100%}
+  .mid{width:auto;flex:1;font-size:14px;padding:10px 6px;gap:6px;border-radius:20px}
+  .mid svg{width:18px;height:18px}
+  .small{flex:0 0 auto;font-size:14px;padding:10px 16px;gap:6px;border-radius:20px}
+  .small svg{width:17px;height:17px}
+
+  input{font-size:16px;padding:13px 14px;border-radius:15px}
+  .crow button{font-size:15px;padding:11px;border-radius:16px}
+  .crow .del{padding:11px 14px}
+
+  .modal{padding:18px;border-radius:20px}
+  .mhead b{font-size:19px}
+  .seg span{font-size:14px;padding:8px 0}
+  .cal .d{font-size:14px;border-radius:10px}
+}
+
+@media (max-width:400px){
+  .slot svg{width:53px;height:53px}
+  .slot{height:90px}
+  .stars{grid-auto-rows:90px}
+  h1{font-size:27px}
+  .cat{font-size:11px}
+}
+
+
+</style>
+
+<div class="app">
+
+  <div class="top">
+    <div class="title">
+      <svg viewBox="0 0 40 40" fill="none" stroke="#ffc400" stroke-width="5" stroke-linecap="round">
+        <path d="M8 10l7 6M6 24h9M12 34l6-7"/></svg>
+      <h1>Мои победы</h1>
+      <svg viewBox="0 0 40 40" fill="none" stroke="#ffc400" stroke-width="5" stroke-linecap="round">
+        <path d="M32 10l-7 6M34 24h-9M28 34l-6-7"/></svg>
+    </div>
+    <div class="count" id="count"></div>
+    <div class="datebar">
+      <div class="arw" id="prev">‹</div>
+      <b id="title"></b>
+      <div class="arw" id="next">›</div>
+    </div>
+  </div>
+
+  <div class="field" id="field"></div>
+
+  <div class="cats" id="cats"></div>
+
+  <div class="composer" id="composer">
+    <input id="draft" placeholder="Запиши свою победу" autocomplete="off">
+    <div class="crow">
+      <button class="ok" id="save">Сохранить</button>
+      <button class="no" id="cancel">Отмена</button>
+      <button class="del" id="remove" style="display:none">Удалить</button>
+    </div>
+  </div>
+
+  <div class="btns" id="btns">
+    <button class="big" id="addbtn">
+      <svg viewBox="0 0 24 24" fill="#ffd93d" stroke="#2b2b2b" stroke-width="2" stroke-linejoin="round">
+        <path d="M12 3l2.9 6.2 6.6.9-4.8 4.6 1.2 6.6L12 18.2 6.1 21.3l1.2-6.6L2.5 10l6.6-.9z"/></svg>
+      Добавить победу
+    </button>
+    <div class="row2">
+    <button class="mid" id="superbtn">
+      <svg viewBox="0 0 24 24" fill="#ffd93d" stroke="#c99700" stroke-width="1.8" stroke-linejoin="round">
+        <path d="M12 3l2.9 6.2 6.6.9-4.8 4.6 1.2 6.6L12 18.2 6.1 21.3l1.2-6.6L2.5 10l6.6-.9z"/>
+        <path d="M8 2.5l1 2M16 2.5l-1 2M12 1v1.6" stroke="#c99700" stroke-width="1.6" stroke-linecap="round"/></svg>
+      Добавить суперпобеду
+    </button>
+    <button class="small" id="calbtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#2b2b2b" stroke-width="2" stroke-linecap="round">
+        <rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/>
+        <circle cx="8" cy="14" r=".9" fill="#2b2b2b"/><circle cx="12" cy="14" r=".9" fill="#2b2b2b"/>
+        <circle cx="16" cy="14" r=".9" fill="#2b2b2b"/><circle cx="8" cy="17.6" r=".9" fill="#2b2b2b"/>
+        <circle cx="12" cy="17.6" r=".9" fill="#2b2b2b"/></svg>
+      Календарь
+    </button>
+    </div>
+  </div>
+</div>
+
+<div class="veil" id="veil">
+  <div class="modal">
+    <div class="mhead"><div class="arw" id="mprev">‹</div><b id="mtitle"></b><div class="arw" id="mnext">›</div></div>
+    <div class="seg" id="seg"></div>
+    <div class="cal" id="cal"></div>
+    <button class="mclose" id="mclose">Готово</button>
+  </div>
+</div>
+
+<script>
+const CATS = [
+  {id:'здоровье', name:'Здоровье', c:'#22b455', f:'#a7e8bd', ic:'<path d="M12 20s-7-4.6-7-9.5A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 7 3.5C19 15.4 12 20 12 20z"/>'},
+  {id:'деньги',   name:'Деньги',   c:'#12703a', f:'#8fd3a8', ic:'<ellipse cx="12" cy="7" rx="7" ry="3"/><path d="M5 7v5c0 1.7 3.1 3 7 3s7-1.3 7-3V7"/><path d="M5 12v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5"/>'},
+  {id:'работа',   name:'Работа',   c:'#2563eb', f:'#adc4fb', ic:'<rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M8.5 7V5.5A1.5 1.5 0 0 1 10 4h4a1.5 1.5 0 0 1 1.5 1.5V7"/><path d="M3 12h18"/>'},
+  {id:'семья',    name:'Семья',    c:'#e63946', f:'#ffb3ae', ic:'<path d="M4 11l8-6.5 8 6.5"/><path d="M6.5 10v9h11v-9"/><path d="M10.5 19v-4.5h3V19"/>'},
+  {id:'обучение', name:'Обучение', c:'#25a8e0', f:'#a6dcf5', ic:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H12v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H12v16h5.5a2.5 2.5 0 0 1 2.5 2.5z"/>'},
+  {id:'развитие', name:'Развитие', c:'#8b5cf6', f:'#cfbcfb', ic:'<path d="M12 3l2.2 4.7 5.1.7-3.7 3.6.9 5.1-4.5-2.4-4.5 2.4.9-5.1L4.7 8.4l5.1-.7z"/>'},
+  {id:'другое',   name:'Другое',   c:'#eab308', f:'#fbe38f', ic:'<circle cx="6" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="18" cy="12" r="1.5"/>'}
+];
+const SUPER = '#e8a800';
+const SUPER_FILL = '#ffe04d';
+const PERIODS = [{id:'день',days:1},{id:'3 дня',days:3},{id:'неделя',days:7}];
+const EMPTY_SLOTS = 20;
+
+let wins = read('pobedy_v3', seed);
+let anchor = startOfDay(new Date());
+let period = 0;
+let picked = 'здоровье';
+let editing = null;
+let superMode = false;
+let calMonth = startOfDay(new Date());
+let justAdded = null;
+
+function read(k, fb){ try { const v = JSON.parse(localStorage.getItem(k)||'null'); return v || fb(); } catch(e){ return fb(); } }
+function save(){ try { localStorage.setItem('pobedy_v3', JSON.stringify(wins)); } catch(e){} }
+function seed(){
+  const d = n => { const x = new Date(); x.setDate(x.getDate()-n); return x.toISOString(); };
+  return [
+    {t:'Сделал зарядку и растяжку, впервые за две недели', s:'здоровье', d:d(0)},
+    {t:'Тренировка в зале — жим 80 кг', s:'спорт', d:d(0)},
+    {t:'Заработал 50 000 ₽ на проекте', s:'деньги', d:d(0)},
+    {t:'Пробежал 7 км', s:'спорт', d:d(2)}
+  ];
+}
+function startOfDay(x){ const d=new Date(x); d.setHours(0,0,0,0); return d; }
+function cat(id){ return CATS.find(c=>c.id===id) || CATS[5]; }
+function esc(s){ return String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
+function rangeStart(){ const d=new Date(anchor); d.setDate(d.getDate()-(PERIODS[period].days-1)); return d; }
+function inRange(w){
+  const t=new Date(w.d).getTime();
+  return t >= rangeStart().getTime() && t < new Date(anchor).setHours(24,0,0,0);
+}
+function visible(){ return wins.filter(inRange); }
+function isToday(){ return startOfDay(new Date()).getTime() === anchor.getTime(); }
+function dayCount(d){ const k=startOfDay(d).getTime();
+  return wins.filter(w=>startOfDay(new Date(w.d)).getTime()===k).length; }
+
+// ── звезда с настоящим скруглением вершин
+function starPath(R, r, roundOut, roundIn){
+  const cx = 50, cy = 51, n = 5;
+  const pts = [];
+  for (let i = 0; i < n * 2; i++) {
+    const rad = i % 2 ? r : R;
+    const a = -Math.PI / 2 + i * Math.PI / n;
+    pts.push([cx + rad * Math.cos(a), cy + rad * Math.sin(a)]);
+  }
+  const seg = (from, to, dist) => {
+    const dx = to[0] - from[0], dy = to[1] - from[1];
+    const len = Math.hypot(dx, dy);
+    const t = Math.min(dist, len * 0.48) / len;
+    return [from[0] + dx * t, from[1] + dy * t];
+  };
+  let d = '';
+  for (let i = 0; i < pts.length; i++) {
+    const prev = pts[(i - 1 + pts.length) % pts.length];
+    const cur  = pts[i];
+    const next = pts[(i + 1) % pts.length];
+    const rr = i % 2 ? roundIn : roundOut;
+    const a = seg(cur, prev, rr);
+    const b = seg(cur, next, rr);
+    d += (i === 0 ? 'M' + a[0].toFixed(2) + ' ' + a[1].toFixed(2)
+                  : 'L' + a[0].toFixed(2) + ' ' + a[1].toFixed(2));
+    d += 'Q' + cur[0].toFixed(2) + ' ' + cur[1].toFixed(2)
+       + ' ' + b[0].toFixed(2) + ' ' + b[1].toFixed(2);
+  }
+  return d + 'Z';
+}
+const STAR_D = starPath(45, 24.5, 8, 10);
+
+function star(fill, stroke, opts){
+  const o = opts || {};
+  const face = o.face !== false;
+  const sup = o.super;
+  const rays = [];
+  if (sup) {                                  // ровное кольцо лучей
+    for (let i = 0; i < 10; i++) {
+      const a = -Math.PI / 2 + i * Math.PI / 5 + Math.PI / 10;
+      const x1 = 50 + 52 * Math.cos(a), y1 = 51 + 52 * Math.sin(a);
+      const x2 = 50 + 62 * Math.cos(a), y2 = 51 + 62 * Math.sin(a);
+      rays.push(`<path d="M${x1.toFixed(1)} ${y1.toFixed(1)}L${x2.toFixed(1)} ${y2.toFixed(1)}"/>`);
+    }
+  }
+  const gid = 'g' + Math.random().toString(36).slice(2, 7);
+  return `<svg viewBox="-14 -14 128 128" fill="none">
+    ${sup ? `<defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ffe98a"/><stop offset="1" stop-color="#ffc21f"/>
+      </linearGradient></defs>
+      <g stroke="#f6b31a" stroke-width="5" stroke-linecap="round" opacity=".95">${rays.join('')}</g>` : ''}
+    <path d="${STAR_D}" fill="${sup ? 'url(#' + gid + ')' : fill}"
+          stroke="${sup ? '#d99000' : stroke}" stroke-width="${sup ? 6.5 : 6}" stroke-linejoin="round"/>
+    ${face ? `<g stroke="${sup ? '#6b4a00' : '#1c1c1c'}" stroke-width="4.6" stroke-linecap="round" fill="none">
+        <path d="M38 54.5q4.4-5.6 8.8 0M53.2 54.5q4.4-5.6 8.8 0"/>
+        <path d="M40.5 64.5q9.5 8.6 19 0"/></g>` : ''}
+  </svg>`;
+}
+
+function slot(w){
+  const i = wins.indexOf(w);
+  const c = cat(w.s);
+  const isNew = justAdded === w.d;
+  const svg = w.super ? star(SUPER_FILL, SUPER, {super:true}) : star(c.f, c.c);
+  return `<div class="slot done${w.super?' super':''}${isNew?' pop':''}" data-edit="${i}">
+    ${svg}<div class="cap">${esc(w.t)}</div></div>`;
+}
+function emptySlot(){ return `<div class="slot empty">${star('none','#c4c2b6',{face:false})}</div>`; }
+
+function render(){
+  const list = visible().sort((a,b)=>new Date(a.d)-new Date(b.d));
+  const n = list.length;
+
+  document.getElementById('count').innerHTML =
+    (period===0 ? (isToday() ? 'Побед сегодня: ' : 'Побед за день: ')
+                : 'Побед за ' + (period===2 ? 'неделю' : '3 дня') + ': ') + '<em>'+n+'</em>';
+  document.getElementById('title').textContent = titleText();
+  document.getElementById('next').className = 'arw' + (isToday() && period===0 ? ' off' : '');
+
+  const field = document.getElementById('field');
+  if (period === 0) {
+    // всего ячеек — всегда кратно 5, минимум 20, чтобы ряды были полными
+    const total = Math.max(EMPTY_SLOTS, Math.ceil((n + 1) / 5) * 5);
+    field.innerHTML = '<div class="stars">' + list.map(slot).join('')
+      + Array(Math.max(0, total - n)).fill(emptySlot()).join('') + '</div>';
+  } else {
+    const byDay = {};
+    list.forEach(w=>{ const k=startOfDay(new Date(w.d)).getTime(); (byDay[k]=byDay[k]||[]).push(w); });
+    let h='';
+    for (let i=0;i<PERIODS[period].days;i++){
+      const d=new Date(anchor); d.setDate(d.getDate()-i);
+      const items = byDay[startOfDay(d).getTime()] || [];
+      h += `<div class="dayline"><span>${d.toLocaleDateString('ru-RU',{weekday:'long',day:'numeric'})}</span>
+            <i></i><b>${items.length}</b></div>`
+         + '<div class="stars">' + (items.length ? items.map(slot).join('')
+            : `<div style="color:#8d8d86;font-size:15px;padding:2px 0 4px">побед не было</div>`) + '</div>';
+    }
+    field.innerHTML = h;
+  }
+
+  document.getElementById('cats').innerHTML = CATS.map(c=>{
+    const on = picked===c.id;
+    return `<div class="cat${on?' on':''}" data-c="${c.id}"
+      style="border-color:${on?c.c:'#c9c7bb'};${on?'background:'+c.c+'14':''}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="${c.c}" stroke-width="2.2"
+           stroke-linecap="round" stroke-linejoin="round">${c.ic}</svg>
+      ${c.name}</div>`;
+  }).join('');
+
+  const solo = period===0;
+  const open = composerOpen();
+  document.getElementById('addbtn').style.display   = solo && !open ? '' : 'none';
+  document.getElementById('superbtn').style.display = solo && !open ? '' : 'none';
+  document.getElementById('cats').style.display     = solo ? '' : 'none';
+  document.getElementById('calbtn').style.display   = open ? 'none' : '';
+  justAdded = null;
+}
+
+function titleText(){
+  if (period===0) return anchor.toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
+  const a=rangeStart(), b=anchor, same=a.getMonth()===b.getMonth();
+  return a.toLocaleDateString('ru-RU', same?{day:'numeric'}:{day:'numeric',month:'long'})
+       + ' — ' + b.toLocaleDateString('ru-RU',{day:'numeric',month:'long'});
+}
+function composerOpen(){ return document.getElementById('composer').classList.contains('on'); }
+
+function openComposer(text, tagId, isSuper){
+  document.getElementById('composer').classList.add('on');
+  document.getElementById('remove').style.display = editing!==null ? '' : 'none';
+  superMode = !!isSuper;
+  document.getElementById('draft').placeholder = superMode
+    ? 'Запиши свою суперпобеду — главное событие дня' : 'Запиши свою победу';
+  if (tagId) picked = tagId;
+  render();
+  const d=document.getElementById('draft'); d.value=text||''; d.focus(); d.select();
+}
+function closeComposer(){
+  editing=null; superMode=false;
+  document.getElementById('composer').classList.remove('on');
+  document.getElementById('draft').value='';
+  render();
+}
+function commit(){
+  const t=document.getElementById('draft').value.trim();
+  if(!t){ closeComposer(); return; }
+  if(editing!==null){ wins[editing].t=t; wins[editing].s=picked; }
+  else {
+    // пишем в выбранный день, время берём текущее
+    const now = new Date();
+    const when = new Date(anchor);
+    when.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
+    const rec={t, s:picked, d:when.toISOString()};
+    if(superMode) rec.super=true;
+    wins.push(rec); justAdded=rec.d;
+    period=0;                      // остаёмся на выбранной дате
+  }
+  save(); closeComposer();
+}
+
+// ── календарь
+function renderCal(){
+  const first=new Date(calMonth.getFullYear(), calMonth.getMonth(), 1);
+  const start=new Date(first); start.setDate(1-((first.getDay()+6)%7));
+  document.getElementById('mtitle').textContent =
+    calMonth.toLocaleDateString('ru-RU',{month:'long',year:'numeric'});
+  document.getElementById('seg').innerHTML = PERIODS
+    .map((p,i)=>`<span class="${i===period?'on':''}" data-p="${i}">${p.id}</span>`).join('');
+  let h = ['пн','вт','ср','чт','пт','сб','вс'].map(d=>`<div class="wd">${d}</div>`).join('');
+  for(let i=0;i<42;i++){
+    const d=new Date(start); d.setDate(start.getDate()+i);
+    const out = d.getMonth()!==calMonth.getMonth() || d>new Date();
+    const n = dayCount(d);
+    const cls = ['d', out?'out':'',
+      startOfDay(d).getTime()===startOfDay(new Date()).getTime()?'today':'',
+      startOfDay(d).getTime()===anchor.getTime()?'sel':''].filter(Boolean).join(' ');
+    h += `<div class="${cls}" data-day="${d.toISOString()}">${d.getDate()}${n?`<i>${n}</i>`:''}</div>`;
+  }
+  document.getElementById('cal').innerHTML = h;
+}
+
+document.addEventListener('click', e=>{
+  const c=e.target.closest('[data-c]');
+  if(c){ picked=c.dataset.c; render(); if(composerOpen()) document.getElementById('draft').focus(); return; }
+  const ed=e.target.closest('[data-edit]');
+  if(ed){ editing=+ed.dataset.edit; openComposer(wins[editing].t, wins[editing].s, wins[editing].super); return; }
+  if(e.target.closest('#addbtn')){ editing=null; openComposer('',null,false); return; }
+  if(e.target.closest('#superbtn')){ editing=null; openComposer('',null,true); return; }
+  if(e.target.id==='save') commit();
+  if(e.target.id==='cancel') closeComposer();
+  if(e.target.id==='remove' && editing!==null){ wins.splice(editing,1); save(); closeComposer(); return; }
+  if(e.target.closest('#calbtn')){ calMonth=new Date(anchor); document.getElementById('veil').classList.add('on'); renderCal(); return; }
+  if(e.target.id==='mclose' || e.target.id==='veil'){ document.getElementById('veil').classList.remove('on'); return; }
+  if(e.target.closest('#mprev')){ calMonth.setMonth(calMonth.getMonth()-1); renderCal(); return; }
+  if(e.target.closest('#mnext')){ calMonth.setMonth(calMonth.getMonth()+1); renderCal(); return; }
+  const p=e.target.closest('[data-p]');
+  if(p){ period=+p.dataset.p; renderCal(); render(); return; }
+  const day=e.target.closest('[data-day]');
+  if(day){ anchor=startOfDay(new Date(day.dataset.day)); renderCal(); render(); return; }
+});
+document.getElementById('draft').addEventListener('keydown', e=>{
+  if(e.key==='Enter') commit();
+  if(e.key==='Escape') closeComposer();
+});
+document.getElementById('prev').onclick=()=>{ anchor.setDate(anchor.getDate()-PERIODS[period].days); render(); };
+document.getElementById('next').onclick=()=>{ anchor.setDate(anchor.getDate()+PERIODS[period].days); render(); };
+
+render();
+</script>
+
+
+</body>
+</html>

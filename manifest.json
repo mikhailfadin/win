@@ -1,0 +1,14 @@
+{
+  "name": "Мои победы",
+  "short_name": "Победы",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fdfbf0",
+  "theme_color": "#fdfbf0",
+  "orientation": "portrait",
+  "icons": [
+    {"src": "icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icon.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
