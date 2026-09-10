@@ -58,6 +58,9 @@ h1{font-size:44px;line-height:1.05;letter-spacing:.5px}
      font-size:23px;border-radius:50%;user-select:none;line-height:1}
 .arw:hover{background:#f0eee0;color:var(--ink)}
 .arw.off{opacity:.22;pointer-events:none}
+.today svg{width:19px;height:19px}
+.today:hover{background:var(--sun);color:var(--ink)}
+.today{margin-left:-4px}
 
 /* ── поле звёзд ── */
 .field{padding:6px 0 2px}
@@ -180,7 +183,9 @@ input::placeholder{color:var(--soft)}
   .title svg{width:24px;height:24px}
   h1{font-size:30px}
   .count{font-size:16px}
-  .datebar{gap:8px;margin-top:3px}
+  .datebar{gap:5px;margin-top:3px}
+  .today{width:32px;margin-left:-2px}
+  .today svg{width:18px;height:18px}
   .datebar b{font-size:16px}
   .arw{width:40px;height:36px;font-size:22px}
 
@@ -255,6 +260,7 @@ input::placeholder{color:var(--soft)}
       <div class="arw" id="prev">‹</div>
       <b id="title"></b>
       <div class="arw" id="next">›</div>
+      <div class="arw today" id="todaybtn" title="Вернуться на сегодня"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="6.6"/><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/><path d="M12 2.2v2.5M12 19.3v2.5M21.8 12h-2.5M4.7 12H2.2"/></svg></div>
     </div>
   </div>
 
@@ -433,6 +439,7 @@ function render(){
                 : 'Побед за ' + (period===2 ? 'неделю' : '3 дня') + ': ') + '<em>'+n+'</em>';
   document.getElementById('title').textContent = titleText();
   document.getElementById('next').className = 'arw' + (isToday() && period===0 ? ' off' : '');
+  document.getElementById('todaybtn').style.display = isToday() ? 'none' : '';
 
   const field = document.getElementById('field');
   if (period === 0) {
@@ -571,6 +578,7 @@ document.getElementById('draft').addEventListener('keydown', e=>{
 });
 document.getElementById('prev').onclick=()=>{ anchor.setDate(anchor.getDate()-PERIODS[period].days); render(); };
 document.getElementById('next').onclick=()=>{ anchor.setDate(anchor.getDate()+PERIODS[period].days); render(); };
+document.getElementById('todaybtn').onclick=()=>{ anchor=startOfDay(new Date()); render(); };
 
 render();
 </script>
