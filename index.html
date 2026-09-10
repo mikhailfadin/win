@@ -52,6 +52,11 @@ b,strong,h1,.bold{font-family:'Balsamiq Sans',sans-serif;font-weight:700}
 h1{font-size:44px;line-height:1.05;letter-spacing:.5px}
 .count{font-size:21px;color:var(--soft);margin-top:1px}
 .count em{font-style:normal;color:var(--ink);font-family:'Balsamiq Sans'}
+.count em.ring{position:relative;display:inline-block;padding:0 4px;margin:0 10px}
+.count em.ring .mk{position:absolute;left:-14px;right:-14px;top:-10px;bottom:-10px;transform:rotate(-4deg);
+  width:auto;height:auto;overflow:visible;pointer-events:none}
+.count em.ring .mk path{fill:none;stroke:#e04a3f;stroke-width:3.2;
+  stroke-linecap:round;stroke-linejoin:round;opacity:.88}
 .datebar{display:flex;align-items:center;gap:14px;margin-top:5px}
 .datebar b{font-size:19px}
 .arw{width:34px;height:34px;display:grid;place-items:center;cursor:pointer;color:var(--soft);
@@ -183,6 +188,8 @@ input::placeholder{color:var(--soft)}
   .title svg{width:24px;height:24px}
   h1{font-size:30px}
   .count{font-size:16px}
+  .count em.ring .mk path{stroke-width:2.6}
+  .count em.ring{margin:0 7px}
   .datebar{gap:5px;margin-top:3px}
   .today{width:32px;margin-left:-2px}
   .today svg{width:18px;height:18px}
@@ -436,7 +443,8 @@ function render(){
 
   document.getElementById('count').innerHTML =
     (period===0 ? (isToday() ? 'Побед сегодня: ' : 'Побед за день: ')
-                : 'Побед за ' + (period===2 ? 'неделю' : '3 дня') + ': ') + '<em>'+n+'</em>';
+                : 'Побед за ' + (period===2 ? 'неделю' : '3 дня') + ': ')
+    + (period===0 ? '<em class="ring">'+n+'<svg class="mk" viewBox="0 0 64 46" preserveAspectRatio="none" aria-hidden="true"><path vector-effect="non-scaling-stroke" d="M48.5 8.5C38.5 2 18.5 3 10 12.5C3.5 20 5.5 33.5 17.5 39.5C30 45.5 50 42 56.5 31.5C62.5 22.5 57 11 42 5.5C36 3.5 27 3 21.5 7"/></svg></em>' : '<em>'+n+'</em>');
   document.getElementById('title').textContent = titleText();
   document.getElementById('next').className = 'arw' + (isToday() && period===0 ? ' off' : '');
   document.getElementById('todaybtn').style.display = isToday() ? 'none' : '';
