@@ -277,8 +277,6 @@ input::placeholder{color:var(--soft)}
     </div>
   </div>
 
-  <div class="gauge" id="gtop"><div class="bar"><i></i></div><b></b></div>
-
   <div class="field" id="field"></div>
 
   <div class="gauge" id="gday"><div class="bar"><i></i></div><b></b></div>
@@ -483,7 +481,6 @@ function render(){
   document.getElementById('next').className = 'arw' + (isToday() && period===0 ? ' off' : '');
   document.getElementById('todaybtn').style.display = isToday() ? 'none' : '';
 
-  fillGauge('gtop', period !== 0, n, period);
   fillGauge('gday', period === 0, n, period);
 
   const field = document.getElementById('field');
