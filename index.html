@@ -62,11 +62,19 @@ h1{font-size:44px;line-height:1.05;letter-spacing:.5px}
 .today:hover{background:var(--sun);color:var(--ink)}
 .today{margin-left:-4px}
 
+/* ── шкала прогресса ── */
+.gauge{display:flex;align-items:center;gap:13px}
+.gauge .bar{flex:1;height:11px;border-radius:8px;background:#e7e5d7}
+.gauge .bar i{display:block;height:100%;border-radius:8px;width:0;
+  transition:width .4s ease,background .4s ease}
+.gauge b{font-size:16px;white-space:nowrap}
+.nowins{color:var(--soft);font-size:15px;padding:2px 0 6px}
+
 /* ── поле звёзд ── */
 .field{padding:6px 0 2px}
 .dayline{display:flex;align-items:center;gap:11px;margin:14px 0 10px}
 .dayline span{font-size:14px;color:var(--soft);white-space:nowrap}
-.dayline i{flex:1;height:2px;background:var(--hair);border-radius:2px}
+.dayline i{flex:1;height:3px;background:var(--hair);border-radius:2px}
 .dayline b{font-size:16px}
 .stars{display:grid;grid-template-columns:repeat(5,1fr);gap:10px 12px;
        grid-auto-rows:146px;justify-items:center;align-items:start}
@@ -189,6 +197,11 @@ input::placeholder{color:var(--soft)}
   .datebar b{font-size:16px}
   .arw{width:40px;height:36px;font-size:22px}
 
+  .gauge{gap:9px}
+  .gauge .bar{height:9px}
+  .gauge b{font-size:13px}
+  .nowins{font-size:13px}
+
   /* звёзды: те же пять в ряд, все 20 на экране */
   .field{padding:2px 0 0}
   .stars{grid-template-columns:repeat(5,1fr);gap:4px 4px;grid-auto-rows:96px}
@@ -264,7 +277,11 @@ input::placeholder{color:var(--soft)}
     </div>
   </div>
 
+  <div class="gauge" id="gtop"><div class="bar"><i></i></div><b></b></div>
+
   <div class="field" id="field"></div>
+
+  <div class="gauge" id="gday"><div class="bar"><i></i></div><b></b></div>
 
   <div class="cats" id="cats"></div>
 
@@ -430,6 +447,31 @@ function slot(w){
 }
 function emptySlot(){ return `<div class="slot empty">${star('none','#c4c2b6',{face:false})}</div>`; }
 
+// ── ступени шкалы: пороги растянуты под длину периода ──
+const GRADES = [
+  {label:'Есть куда расти',  c:'#a8a69a', t:'#8d8d86'},
+  {label:'Уже неплохо',      c:'#eab308', t:'#c99700'},
+  {label:'Так держать',      c:'#22b455', t:'#22b455'},
+  {label:'Вот это уровень!', c:'#2fd44f', t:'#12a03d'}
+];
+const STEPS = [[3,5,8], [6,12,21], [14,28,49]];
+
+function grade(n, p){
+  const s = STEPS[p];
+  const i = n>=s[2] ? 3 : n>=s[1] ? 2 : n>=s[0] ? 1 : 0;
+  return Object.assign({pct: Math.min(100, Math.round(n / s[2] * 100))}, GRADES[i]);
+}
+function fillGauge(id, show, n, p){
+  const el = document.getElementById(id);
+  el.style.display = show ? '' : 'none';
+  if (!show) return;
+  const g = grade(n, p), bar = el.querySelector('i'), lab = el.querySelector('b');
+  bar.style.width = g.pct + '%';
+  bar.style.background = g.c;
+  lab.textContent = g.label;
+  lab.style.color = g.t;
+}
+
 function render(){
   const list = visible().sort((a,b)=>new Date(a.d)-new Date(b.d));
   const n = list.length;
@@ -440,6 +482,9 @@ function render(){
   document.getElementById('title').textContent = titleText();
   document.getElementById('next').className = 'arw' + (isToday() && period===0 ? ' off' : '');
   document.getElementById('todaybtn').style.display = isToday() ? 'none' : '';
+
+  fillGauge('gtop', period !== 0, n, period);
+  fillGauge('gday', period === 0, n, period);
 
   const field = document.getElementById('field');
   if (period === 0) {
@@ -454,10 +499,12 @@ function render(){
     for (let i=0;i<PERIODS[period].days;i++){
       const d=new Date(anchor); d.setDate(d.getDate()-i);
       const items = byDay[startOfDay(d).getTime()] || [];
+      const dg = grade(items.length, 0);
       h += `<div class="dayline"><span>${d.toLocaleDateString('ru-RU',{weekday:'long',day:'numeric'})}</span>
-            <i></i><b>${items.length}</b></div>`
-         + '<div class="stars">' + (items.length ? items.map(slot).join('')
-            : `<div style="color:#8d8d86;font-size:15px;padding:2px 0 4px">побед не было</div>`) + '</div>';
+            <i style="background:linear-gradient(90deg,${dg.c} ${dg.pct}%,var(--hair) ${dg.pct}%)"></i>
+            <b>${items.length}</b></div>`
+         + (items.length ? '<div class="stars">' + items.map(slot).join('') + '</div>'
+                         : '<div class="nowins">побед не было</div>');
     }
     field.innerHTML = h;
   }
