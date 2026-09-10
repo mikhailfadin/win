@@ -3,6 +3,7 @@ const SUPA_URL = 'https://wbvftguatzdwarlnfcdx.supabase.co';
 const SUPA_KEY = 'sb_publishable_bocQCd7kqZ0wDCGrwjntAg_h9DZyy4I';
 
 let sb = null, user = null, syncing = false;
+function inDemo(){ return typeof demoMode !== 'undefined' && demoMode; }
 
 function uid(){
   return (crypto.randomUUID ? crypto.randomUUID()
@@ -43,7 +44,7 @@ async function initCloud(){
 
 // первый вход: заливаем локальное, забираем облачное. Привычки раньше побед — на них ссылаются отметки
 async function firstSync(){
-  if (!sb || !user || syncing) return;
+  if (inDemo() || !sb || !user || syncing) return;
   syncing = true; paintAuth();
   try {
     const lh = habits.filter(h => !h.synced);
@@ -72,7 +73,7 @@ async function pullAll(){
 }
 
 function subscribeLive(){
-  if (!sb || !user) return;
+  if (inDemo() || !sb || !user) return;
   const f = `user_id=eq.${user.id}`;
   sb.channel('pobedy-live')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'wins',   filter: f }, () => pullQuiet())
@@ -81,14 +82,14 @@ function subscribeLive(){
 }
 
 async function pullQuiet(){
-  if (!sb || !user) return;
+  if (inDemo() || !sb || !user) return;
   await pullAll();
   render();
 }
 
 // отправка одной записи; не вышло — останется помеченной и уйдёт позже
 async function pushWin(w){
-  if (!sb || !user) return;
+  if (inDemo() || !sb || !user) return;
   if (w.h) {
     const h = habits.find(x => x.id === w.h);
     if (h && !h.synced) await pushHabit(h);
@@ -98,18 +99,18 @@ async function pushWin(w){
 }
 
 async function pushHabit(h){
-  if (!sb || !user) return;
+  if (inDemo() || !sb || !user) return;
   const { error } = await sb.from('habits').upsert(habitRow(h), { onConflict: 'id' });
   if (!error) { h.synced = true; saveHabits(); paintAuth(); }
 }
 
 async function deleteWin(id){
-  if (!sb || !user) return;
+  if (inDemo() || !sb || !user) return;
   await sb.from('wins').delete().eq('id', id);
 }
 
 async function pushPending(){
-  if (!sb || !user) return;
+  if (inDemo() || !sb || !user) return;
   for (const h of habits.filter(x => !x.synced)) await pushHabit(h);
   for (const w of wins.filter(x => !x.synced)) await pushWin(w);
   paintAuth();

@@ -212,6 +212,10 @@ h1{font-size:44px;line-height:1.05;letter-spacing:.5px}
   border-radius:18px;padding:6px 14px;cursor:pointer}
 .screen-top span{width:92px}
 .scrbody{display:flex;flex-direction:column;gap:16px}
+.way-demo{font:inherit;font-size:16px;font-weight:700;cursor:pointer;border:2.5px solid var(--btn-br);border-radius:20px;
+  background:var(--btn);color:var(--btn-fg);padding:12px 16px}
+.authbar button.ghost{background:var(--card);border-color:var(--hair);color:var(--ink);font-weight:400}
+.authbar.demo{background:var(--authin);border-color:var(--authin-br)}
 .way{background:var(--card);border:2px solid var(--hair);border-radius:20px;padding:16px 18px}
 .way h3{font-size:19px;margin-bottom:6px}
 .way p{font-size:15.5px;line-height:1.5;max-width:64ch}
@@ -531,23 +535,60 @@ let justAdded = null;
 let habits = readHabits();
 let hsOpen = false, hsMode = 'list', hsForm = null;
 let streakCache = null;
+let demoMode = false;
 
 function read(k, fb){ try { const v = JSON.parse(localStorage.getItem(k)||'null'); return v || fb(); } catch(e){ return fb(); } }
-function save(){ try { localStorage.setItem('pobedy_v3', JSON.stringify(wins)); } catch(e){} }
+function save(){ if (demoMode) return; try { localStorage.setItem('pobedy_v3', JSON.stringify(wins)); } catch(e){} }
 function readHabits(){ try { return JSON.parse(localStorage.getItem('pobedy_habits') || '[]') || []; } catch(e){ return []; } }
-function saveHabits(){ try { localStorage.setItem('pobedy_habits', JSON.stringify(habits)); } catch(e){} }
+function saveHabits(){ if (demoMode) return; try { localStorage.setItem('pobedy_habits', JSON.stringify(habits)); } catch(e){} }
 function newId(){ return typeof uid === 'function' ? uid() : String(Date.now()) + Math.random().toString(16).slice(2); }
-function seed(){
-  const d = n => { const x = new Date(); x.setDate(x.getDate()-n); return x.toISOString(); };
-  const mk = (t,s,dd,sup) => ({id:(typeof uid==='function'?uid():String(Math.random())),
-                               t, s, d:dd, super:!!sup, synced:false});
-  return [
-    {t:'Сделал зарядку и растяжку, впервые за две недели', s:'здоровье', d:d(0)},
-    {t:'Тренировка в зале — жим 80 кг', s:'спорт', d:d(0)},
-    {t:'Заработал 50 000 ₽ на проекте', s:'деньги', d:d(0)},
-    {t:'Пробежал 7 км', s:'спорт', d:d(2)}
+
+// ── «Посмотреть пример»: год тестовых данных только в памяти — ничего не сохраняется и не уходит в облако ──
+function makeDemo(){
+  let n = 7; const rnd = () => (n = (n * 16807) % 2147483647) / 2147483647;
+  const ids = ['здоровье','деньги','работа','семья','обучение','развитие','энергия','режим','другое'], wt = [5,2,6,2,3,3,2,2,1];
+  const pick = () => { let t = rnd() * 26, i = 0; while ((t -= wt[i]) > 0) i++; return ids[i]; };
+  const TX = {'здоровье':['Тренировка в зале','Пробежал 7 км','Растяжка 20 минут'],'деньги':['Закрыл счёт клиента','Отложил 10%','Заработал 50 000 ₽'],
+    'работа':['Провёл планёрку','Сдал проект','Созвон с партнёром','Разобрал почту'],'семья':['Позвонил отцу','Ужин с семьёй'],
+    'обучение':['Прочитал 30 страниц','Урок английского'],'развитие':['Випассана','Практика по вайб-кодингу'],
+    'энергия':['Холодный душ','Прогулка без телефона'],'режим':['Лёг до 23:00','Встал в 7:00'],'другое':['Разобрал гараж']};
+  const SUP = ['Запустил приложение побед','Подписали контракт','Выступил на конференции','Закрыл квартал в плюс','Пробежал полумарафон'];
+  const today = startOfDay(new Date()), day = i => { const d = new Date(today); d.setDate(d.getDate() - i); return d; };
+  const W = [];
+  for (let i = 330; i >= 0; i--) {
+    const d = day(i), wd = (d.getDay() + 6) % 7;
+    if (rnd() < 0.14) continue;
+    const k = Math.floor(rnd() * 4) + (wd === 1 ? 4 : wd >= 5 ? 0 : 2) + (i < 40 ? 2 : 0);
+    for (let j = 0; j < k; j++) { const s = pick(), t = new Date(d); t.setHours(8 + j);
+      W.push({id:'demo'+i+'_'+j, t:TX[s][j % TX[s].length], s, d:t.toISOString(), synced:true}); }
+    if (rnd() < 0.045) { const t = new Date(d); t.setHours(21);
+      W.push({id:'demos'+i, t:SUP[Math.floor(rnd() * SUP.length)], s:pick(), d:t.toISOString(), super:true, synced:true}); }
+  }
+  const H = [
+    {id:'dh1', n:'Зарядка', s:'здоровье', start:95, gaps:[]},
+    {id:'dh2', n:'Лёг до 23:00', s:'режим', start:120, gaps:[29, 60, 61]},
+    {id:'dh3', n:'Холодный душ', s:'энергия', start:12, gaps:[]},
+    {id:'dh4', n:'Чтение 20 страниц', s:'обучение', start:70, gaps:[4, 18, 33, 40]},
+    {id:'dh5', n:'Звонок родителям', s:'семья', start:3, gaps:[0]}
   ];
+  H.forEach(h => { for (let i = h.start - 1; i >= 0; i--) if (!h.gaps.includes(i)) { const t = day(i); t.setHours(7);
+    W.push({id:h.id+'_'+i, t:h.n, s:h.s, d:t.toISOString(), h:h.id, synced:true}); } });
+  return {wins: W, habits: H.map(h => ({id:h.id, n:h.n, s:h.s, archived:false, created:day(h.start - 1).toISOString(), synced:true}))};
 }
+function startDemo(){
+  demoMode = true;
+  const d = makeDemo(); wins = d.wins; habits = d.habits;
+  anchor = startOfDay(new Date()); period = 0; hsOpen = false;
+  if (scr) closeScreen();
+  if (composerOpen()) closeComposer();
+  render(); window.scrollTo(0, 0);
+}
+// выход из аккаунта: стираем победы и привычки с устройства, чтобы следующий человек их не увидел
+function clearLocal(){
+  wins = []; habits = []; streakCache = null;
+  try { localStorage.removeItem('pobedy_v3'); localStorage.removeItem('pobedy_habits'); } catch(e){}
+}
+function seed(){ return []; }
 function startOfDay(x){ const d=new Date(x); d.setHours(0,0,0,0); return d; }
 function cat(id){ return CATS.find(c=>c.id===id) || CATS[5]; }
 function esc(s){ return String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
@@ -826,7 +867,8 @@ function wayHTML(){
     return `<span class="pill" style="background:${c}22;border-color:${c};color:${t}">${['0–2','3–4','5–7','8+'][i]} · ${x.label}</span>`; }).join('');
   const lv = [1, 7, 21, 90, 180].map(n => habitStar(n, cat('здоровье'))).join('');
   const card = (t, p, extra) => `<div class="way"><h3>${t}</h3><p>${p}</p>${extra || ''}</div>`;
-  return card('Победа — это любой сделанный шаг',
+  return (demoMode ? '' : '<button class="way-demo" id="demobtn2">Посмотреть пример — как приложение выглядит через год</button>')
+    + card('Победа — это любой сделанный шаг',
       'Не только 50 000 ₽ и новый клиент. Встал вовремя, позвонил отцу, закрыл хвост — это тоже победы. Записал победу — зажглась звезда. Из мелких побед складывается характер.')
     + card('Суперпобеда — одна в день',
       'Это то, чем будешь гордиться через год. Не ставь её каждый день — иначе золото обесценится.',
@@ -1084,6 +1126,7 @@ function renderCal(){
 
 document.addEventListener('click', e=>{
   if (e.target.closest('#waybtn')) { openScreen('way'); return; }
+  if (e.target.closest('#demobtn2')) { startDemo(); return; }
   if (e.target.closest('#statsbtn')) { openScreen('stats'); return; }
   if (e.target.closest('#scrback')) { closeScreen(); return; }
   const per = e.target.closest('[data-per]');
@@ -1149,6 +1192,12 @@ render();
 function paintAuth(){
   const bar = document.getElementById('authbar');
   if (!bar) return;
+  if (demoMode) {
+    bar.className = 'authbar demo';
+    bar.innerHTML = `<span>Это пример с тестовыми данными за год — здесь ничего не сохраняется</span>
+      <button id="demoexit">Выйти из примера</button>`;
+    return;
+  }
   if (typeof user !== 'undefined' && user) {
     const pending = wins.filter(w => !w.synced).length + habits.filter(h => !h.synced).length;
     bar.className = 'authbar in';
@@ -1158,7 +1207,8 @@ function paintAuth(){
   } else {
     bar.className = 'authbar';
     bar.innerHTML = `<span>⭐ Победы пока только на этом устройстве</span>
-      <button id="inbtn">Войти и синхронизировать</button>`;
+      <button id="inbtn">Войти и синхронизировать</button>
+      <button id="demobtn" class="ghost">Посмотреть пример</button>`;
   }
 }
 
@@ -1198,7 +1248,13 @@ document.addEventListener('click', async e => {
     }
     return;
   }
-  if (e.target.id === 'outbtn') { await signOut(); paintAuth(); render(); }
+  if (e.target.id === 'demobtn') { startDemo(); return; }
+  if (e.target.id === 'demoexit') { location.reload(); return; }
+  if (e.target.id === 'outbtn') {
+    const pending = wins.filter(w => !w.synced).length + habits.filter(h => !h.synced).length;
+    if (pending && !confirm(`Ещё не отправлено в облако: ${pending}. Если выйти сейчас, эти записи сотрутся с устройства. Выйти?`)) return;
+    await signOut(); clearLocal(); paintAuth(); render();
+  }
 });
 
 // ── светлая / тёмная тема ──
