@@ -166,6 +166,34 @@ h1{font-size:44px;line-height:1.05;letter-spacing:.5px}
 .mid svg{width:24px;height:24px}
 .small svg{width:20px;height:20px}
 
+/* ── пара кнопок и привычки ── */
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.pair .big{font-size:22px;padding:14px 8px;gap:10px}
+.btns .mid{width:100%;flex:none}
+.calarw svg{width:19px;height:19px}
+#title{cursor:pointer}
+.hs-hint{font-size:13px;color:var(--soft);text-align:center;margin:-3px 0 -4px}
+.hsheet{display:none;flex-direction:column;gap:8px}
+.hsheet.on{display:flex}
+.hs-title{font-weight:700;font-size:20px;text-align:center}
+.hrow{display:flex;align-items:center;gap:12px;background:var(--card);border:2.5px solid var(--hair);
+  border-radius:18px;padding:7px 14px;cursor:pointer;transition:border-color .12s}
+.hrow:hover{border-color:var(--soft)}
+.hrow svg{width:46px;height:46px;flex:none;overflow:visible}
+.hrow .nm{flex:1;font-size:17px;line-height:1.2;min-width:0}
+.hrow .nm small{display:block;font-size:12.5px;color:var(--soft)}
+.hrow .st{font-size:14px;color:var(--soft);white-space:nowrap}
+.hrow.done{opacity:.55;cursor:default}
+.hrow.done:hover{border-color:var(--hair)}
+.hrow.done .st{color:var(--ink)}
+.hs-add{border:2.5px dashed var(--hair);border-radius:18px;padding:11px;text-align:center;color:var(--soft);
+  cursor:pointer;font-size:15px}
+.hs-add:hover{border-color:var(--soft);color:var(--ink)}
+.hs-empty{font-size:15px;color:var(--soft);text-align:center;padding:8px 10px;line-height:1.4}
+.hs-foot{display:flex;justify-content:center;gap:22px;font-size:14px;color:var(--soft)}
+.hs-foot span{cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.hs-foot span:hover{color:var(--ink)}
+
 /* ── ввод ── */
 .composer{display:none;flex-direction:column;gap:11px}
 .composer.on{display:flex}
@@ -226,6 +254,18 @@ input::placeholder{color:var(--soft)}
   .datebar b{font-size:16px}
   .arw{width:40px;height:36px;font-size:22px}
 
+  .pair{gap:8px}
+  .pair .big{font-size:13.5px;padding:12px 2px;gap:5px;white-space:nowrap}
+  .pair .big svg{width:16px;height:16px}
+  .btns .mid{font-size:14px;padding:10px 6px}
+  .calarw{display:none}
+  #title::after{content:" ▾";color:var(--soft);font-size:.8em}
+  .hrow{padding:6px 10px;gap:9px;border-radius:15px}
+  .hrow svg{width:38px;height:38px}
+  .hrow .nm{font-size:14.5px}
+  .hrow .nm small{font-size:11px}
+  .hrow .st{font-size:12px}
+  .hs-title{font-size:17px}
   .themebtn{top:9px;right:10px;width:32px;height:32px}
   .themebtn svg{width:17px;height:17px}
   .gauge{gap:9px}
@@ -305,6 +345,7 @@ input::placeholder{color:var(--soft)}
       <div class="arw" id="prev">‹</div>
       <b id="title"></b>
       <div class="arw" id="next">›</div>
+      <div class="arw calarw" id="calbtn" title="Календарь"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/><circle cx="8" cy="14" r=".9" fill="currentColor"/><circle cx="12" cy="14" r=".9" fill="currentColor"/><circle cx="16" cy="14" r=".9" fill="currentColor"/><circle cx="8" cy="17.6" r=".9" fill="currentColor"/><circle cx="12" cy="17.6" r=".9" fill="currentColor"/></svg></div>
       <div class="arw today" id="todaybtn" title="Вернуться на сегодня"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="6.6"/><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/><path d="M12 2.2v2.5M12 19.3v2.5M21.8 12h-2.5M4.7 12H2.2"/></svg></div>
     </div>
   </div>
@@ -313,10 +354,10 @@ input::placeholder{color:var(--soft)}
 
   <div class="gauge" id="gday"><div class="bar"><i></i></div><b></b></div>
 
-  <div class="cats" id="cats"></div>
-
   <div class="composer" id="composer">
     <input id="draft" placeholder="Запиши свою победу" autocomplete="off">
+    <div class="hs-hint">в какую сферу?</div>
+    <div class="cats" id="cats"></div>
     <div class="crow">
       <button class="ok" id="save">Сохранить</button>
       <button class="no" id="cancel">Отмена</button>
@@ -324,28 +365,28 @@ input::placeholder{color:var(--soft)}
     </div>
   </div>
 
+  <div class="hsheet" id="hsheet"></div>
+
   <div class="btns" id="btns">
+    <div class="pair" id="pair">
     <button class="big" id="addbtn">
       <svg viewBox="0 0 24 24" fill="#ffd93d" stroke="#2b2b2b" stroke-width="2" stroke-linejoin="round">
         <path d="M12 3l2.9 6.2 6.6.9-4.8 4.6 1.2 6.6L12 18.2 6.1 21.3l1.2-6.6L2.5 10l6.6-.9z"/></svg>
       Добавить победу
     </button>
-    <div class="row2">
+    <button class="big" id="habitbtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 12a8 8 0 0 1 13.7-5.7L20 8.5"/><path d="M20 3.5v5h-5"/>
+        <path d="M20 12a8 8 0 0 1-13.7 5.7L4 15.5"/><path d="M4 20.5v-5h5"/></svg>
+      Добавить привычку
+    </button>
+    </div>
     <button class="mid" id="superbtn">
       <svg viewBox="0 0 24 24" fill="#ffd93d" stroke="#c99700" stroke-width="1.8" stroke-linejoin="round">
         <path d="M12 3l2.9 6.2 6.6.9-4.8 4.6 1.2 6.6L12 18.2 6.1 21.3l1.2-6.6L2.5 10l6.6-.9z"/>
         <path d="M8 2.5l1 2M16 2.5l-1 2M12 1v1.6" stroke="#c99700" stroke-width="1.6" stroke-linecap="round"/></svg>
       Добавить суперпобеду
     </button>
-    <button class="small" id="calbtn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/>
-        <circle cx="8" cy="14" r=".9" fill="currentColor"/><circle cx="12" cy="14" r=".9" fill="currentColor"/>
-        <circle cx="16" cy="14" r=".9" fill="currentColor"/><circle cx="8" cy="17.6" r=".9" fill="currentColor"/>
-        <circle cx="12" cy="17.6" r=".9" fill="currentColor"/></svg>
-      Календарь
-    </button>
-    </div>
   </div>
 </div>
 
@@ -384,9 +425,15 @@ let editing = null;
 let superMode = false;
 let calMonth = startOfDay(new Date());
 let justAdded = null;
+let habits = readHabits();
+let hsOpen = false, hsMode = 'list', hsForm = null;
+let streakCache = null;
 
 function read(k, fb){ try { const v = JSON.parse(localStorage.getItem(k)||'null'); return v || fb(); } catch(e){ return fb(); } }
 function save(){ try { localStorage.setItem('pobedy_v3', JSON.stringify(wins)); } catch(e){} }
+function readHabits(){ try { return JSON.parse(localStorage.getItem('pobedy_habits') || '[]') || []; } catch(e){ return []; } }
+function saveHabits(){ try { localStorage.setItem('pobedy_habits', JSON.stringify(habits)); } catch(e){} }
+function newId(){ return typeof uid === 'function' ? uid() : String(Date.now()) + Math.random().toString(16).slice(2); }
 function seed(){
   const d = n => { const x = new Date(); x.setDate(x.getDate()-n); return x.toISOString(); };
   const mk = (t,s,dd,sup) => ({id:(typeof uid==='function'?uid():String(Math.random())),
@@ -475,12 +522,147 @@ function slot(w){
   const c = cat(w.s);
   const isNew = justAdded === w.d;
   const t = tint(c);
+  const hb = w.h ? habits.find(x => x.id === w.h) : null;
   const svg = w.super ? star(SUPER_FILL, SUPER, {super:true})
-                      : star(t.f, t.c, {faceColor: isDark() ? t.c : '#1c1c1c'});
-  return `<div class="slot done${w.super?' super':''}${isNew?' pop':''}" data-edit="${i}">
-    ${svg}<div class="cap">${esc(w.t)}</div></div>`;
+            : hb ? habitStar(streakOn(hb.id, w.d), cat(hb.s))
+            : star(t.f, t.c, {faceColor: isDark() ? t.c : '#1c1c1c'});
+  return `<div class="slot done${w.super?' super':''}${hb?' habit':''}${isNew?' pop':''}" data-edit="${i}">
+    ${svg}<div class="cap">${esc(hb ? hb.n : w.t)}</div></div>`;
 }
 function emptySlot(){ return `<div class="slot empty">${star('none', isDark() ? '#46443c' : '#c4c2b6', {face:false})}</div>`; }
+
+// ── привычки: уровень считается по серии дней, пропуск откатывает на уровень ниже ──
+const LV_START = [1, 7, 21, 90, 180];
+function lvlOf(c){ return c >= 180 ? 5 : c >= 90 ? 4 : c >= 21 ? 3 : c >= 7 ? 2 : c >= 1 ? 1 : 0; }
+function dropLevel(c){ const L = lvlOf(c); return L <= 1 ? 0 : LV_START[L - 2]; }
+function dayKey(d){ const x = new Date(d); return x.getFullYear() + '-' + (x.getMonth() + 1) + '-' + x.getDate(); }
+function dayWord(n){ const a = n % 10, b = n % 100;
+  return a === 1 && b !== 11 ? 'день' : a >= 2 && a <= 4 && (b < 12 || b > 14) ? 'дня' : 'дней'; }
+
+function streaks(){
+  if (streakCache) return streakCache;
+  const out = {}, today = startOfDay(new Date());
+  for (const h of habits) {
+    const marks = wins.filter(w => w.h === h.id), at = {};
+    let c = 0;
+    if (marks.length) {
+      const days = new Set(marks.map(w => dayKey(w.d)));
+      const d = startOfDay(new Date(Math.min(...marks.map(w => new Date(w.d).getTime()))));
+      for (; d <= today; d.setDate(d.getDate() + 1)) {
+        const k = dayKey(d);
+        if (days.has(k)) { c += 1; at[k] = c; }
+        else if (d < today) c = dropLevel(c);
+      }
+    }
+    out[h.id] = {at, now: c};
+  }
+  return (streakCache = out);
+}
+function streakOn(hid, d){ const s = streaks()[hid]; return (s && s.at[dayKey(d)]) || 1; }
+function streakNow(hid){ const s = streaks()[hid]; return s ? s.now : 0; }
+function markedOn(hid, d){ const k = dayKey(d); return wins.some(w => w.h === hid && dayKey(w.d) === k); }
+
+// звезда привычки: 1 спит · 2 улыбается · 3 смеётся с румянцем · 4 сияет · 5 золотые обводка и лучи
+function habitStar(n, c, noBadge){
+  const L = Math.max(1, lvlOf(n)), t = tint(c), fc = isDark() ? t.c : '#1c1c1c', gold = L === 5;
+  const edge = gold ? '#e0a100' : t.c;
+  let rays = '';
+  if (L >= 4) for (let i = 0; i < 10; i++) {
+    const a = -Math.PI / 2 + i * Math.PI / 5 + Math.PI / 10;
+    rays += `M${(50+52*Math.cos(a)).toFixed(1)} ${(51+52*Math.sin(a)).toFixed(1)}L${(50+62*Math.cos(a)).toFixed(1)} ${(51+62*Math.sin(a)).toFixed(1)}`;
+  }
+  const eyes = 'M38 54.5q4.4-5.6 8.8 0M53.2 54.5q4.4-5.6 8.8 0';
+  const face = L === 1 ? `<path d="M38.5 55q4.2 3 8.4 0M53.1 55q4.2 3 8.4 0M45 65.5h10" stroke="${fc}"/>`
+             : L === 2 ? `<path d="${eyes}M40.5 64.5q9.5 8.6 19 0" stroke="${fc}"/>`
+             : `<path d="${eyes}" stroke="${fc}"/><path d="M40.5 62.5h19q-1 11-9.5 11t-9.5-11z" fill="${fc}"/>`
+               + '<ellipse cx="31.5" cy="62" rx="5" ry="3.2" fill="#ff6f86" opacity=".5"/>'
+               + '<ellipse cx="68.5" cy="62" rx="5" ry="3.2" fill="#ff6f86" opacity=".5"/>';
+  return `<svg viewBox="-14 -14 128 128" fill="none" stroke-linecap="round">
+    ${rays ? `<path d="${rays}" stroke="${gold ? '#f6b31a' : t.c}" stroke-width="5"/>` : ''}
+    <path d="${STAR_D}" fill="${t.f}" stroke="${edge}" stroke-width="6" stroke-linejoin="round"/>
+    <g stroke-width="4.6" fill="none">${face}</g>
+    ${noBadge ? '' : `<circle cx="88" cy="86" r="16.5" style="fill:var(--paper)" stroke="${edge}" stroke-width="4"/>
+    <text x="88" y="92.8" text-anchor="middle" font-size="${n > 99 ? 15 : 19}" font-weight="700" style="fill:var(--ink)">${n}</text>`}
+  </svg>`;
+}
+
+function markHabit(id){
+  const h = habits.find(x => x.id === id);
+  if (!h || markedOn(id, anchor)) return;
+  const now = new Date(), when = new Date(anchor);
+  when.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
+  const rec = {id: newId(), t: h.n, s: h.s, d: when.toISOString(), h: id, synced: false};
+  wins.push(rec); justAdded = rec.d; save();
+  if (typeof pushWin === 'function') pushWin(rec);
+  hsOpen = false; render();
+}
+function unmarkHabit(i){
+  const w = wins[i], h = habits.find(x => x.id === w.h);
+  const when = new Date(w.d).toLocaleDateString('ru-RU', {day:'numeric', month:'long'});
+  if (!confirm(`Снять отметку «${h ? h.n : w.t}» за ${when}?`)) return;
+  wins.splice(i, 1); save();
+  if (typeof deleteWin === 'function' && w.id) deleteWin(w.id);
+  render();
+}
+function focusHabitName(){ const el = document.getElementById('hname'); if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); } }
+function saveHabitForm(){
+  const name = (document.getElementById('hname').value || '').trim();
+  if (!name) { focusHabitName(); return; }
+  let h;
+  if (hsForm.id) {
+    h = habits.find(x => x.id === hsForm.id);
+    h.n = name; h.s = hsForm.s; h.synced = false;
+  } else {
+    h = {id: newId(), n: name, s: hsForm.s, archived: false, created: new Date().toISOString(), synced: false};
+    habits.push(h);
+  }
+  saveHabits();
+  if (typeof pushHabit === 'function') pushHabit(h);
+  hsMode = 'list'; hsForm = null; render();
+}
+function archiveHabit(){
+  const h = habits.find(x => x.id === hsForm.id);
+  if (!h || !confirm(`Убрать «${h.n}» из списка? Отметки в прошлых днях останутся.`)) return;
+  h.archived = true; h.synced = false; saveHabits();
+  if (typeof pushHabit === 'function') pushHabit(h);
+  hsMode = 'list'; hsForm = null; render();
+}
+function renderHabitSheet(){
+  const el = document.getElementById('hsheet');
+  el.classList.toggle('on', hsOpen);
+  if (!hsOpen) { el.innerHTML = ''; return; }
+  if (hsMode === 'form') {
+    const f = hsForm;
+    const chips = CATS.map(c => { const on = f.s === c.id, cl = tint(c).c;
+      return `<div class="cat${on ? ' on' : ''}" data-hcat="${c.id}"
+        style="border-color:${on ? cl : 'var(--hair)'};${on ? 'background:' + cl + (isDark() ? '26' : '14') : ''}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="${cl}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${c.ic}</svg>
+        ${c.name}</div>`; }).join('');
+    el.innerHTML = `<div class="hs-title">${f.id ? 'Изменить привычку' : 'Новая привычка'}</div>
+      <input id="hname" placeholder="Например: рано вставать" autocomplete="off" value="${esc(f.n)}">
+      <div class="hs-hint">в какую сферу?</div>
+      <div class="cats">${chips}</div>
+      <div class="crow"><button class="ok" id="hsave">Сохранить</button><button class="no" id="hback">Назад</button>
+        ${f.id ? '<button class="del" id="hdel">Убрать</button>' : ''}</div>`;
+    return;
+  }
+  const edit = hsMode === 'edit', live = habits.filter(h => !h.archived);
+  const rows = live.map(h => {
+    const c = cat(h.s), done = markedOn(h.id, anchor), n = streakNow(h.id);
+    const lv = done ? streakOn(h.id, anchor) : Math.max(1, n);
+    const act = edit ? `data-hedit="${h.id}"` : done ? '' : `data-hmark="${h.id}"`;
+    const right = edit ? 'изменить ›' : done ? 'отмечено ✓' : n ? n + ' ' + dayWord(n) : 'начать';
+    return `<div class="hrow${done && !edit ? ' done' : ''}" ${act}>${habitStar(lv, c, true)}
+      <div class="nm">${esc(h.n)}<small>${c.name}</small></div><div class="st">${right}</div></div>`;
+  }).join('');
+  const dayTxt = isToday() ? 'отметка на сегодня'
+    : 'отметка за ' + anchor.toLocaleDateString('ru-RU', {weekday:'long', day:'numeric', month:'long'});
+  el.innerHTML = `<div class="hs-title">${edit ? 'Мои привычки' : 'Какую привычку отметить?'}</div>
+    ${edit ? '' : `<div class="hs-hint">${dayTxt}</div>`}
+    ${rows || '<div class="hs-empty">Пока нет ни одной привычки.<br>Добавь первую — например, «Рано вставать».</div>'}
+    <div class="hs-add" id="hsnew">+ новая привычка</div>
+    <div class="hs-foot">${live.length ? `<span id="hsedit">${edit ? 'готово' : 'изменить список'}</span>` : ''}<span id="hsclose">закрыть</span></div>`;
+}
 
 // ── ступени шкалы: пороги растянуты под длину периода ──
 const GRADES = [
@@ -510,6 +692,8 @@ function fillGauge(id, show, n, p){
 }
 
 function render(){
+  streakCache = null;
+  if (period !== 0) hsOpen = false;
   const list = visible().sort((a,b)=>new Date(a.d)-new Date(b.d));
   const n = list.length;
 
@@ -555,11 +739,10 @@ function render(){
   }).join('');
 
   const solo = period===0;
-  const open = composerOpen();
-  document.getElementById('addbtn').style.display   = solo && !open ? '' : 'none';
-  document.getElementById('superbtn').style.display = solo && !open ? '' : 'none';
-  document.getElementById('cats').style.display     = solo ? '' : 'none';
-  document.getElementById('calbtn').style.display   = open ? 'none' : '';
+  const busy = composerOpen() || hsOpen;
+  document.getElementById('pair').style.display     = solo && !busy ? '' : 'none';
+  document.getElementById('superbtn').style.display = solo && !busy ? '' : 'none';
+  renderHabitSheet();
   if (typeof paintAuth === 'function') paintAuth();
   justAdded = null;
 }
@@ -632,10 +815,26 @@ function renderCal(){
 }
 
 document.addEventListener('click', e=>{
+  if (e.target.closest('#habitbtn')) { hsOpen = true; hsMode = 'list'; hsForm = null; render(); return; }
+  const hm = e.target.closest('[data-hmark]');
+  if (hm) { markHabit(hm.dataset.hmark); return; }
+  const he = e.target.closest('[data-hedit]');
+  if (he) { const h = habits.find(x => x.id === he.dataset.hedit);
+    hsForm = {id: h.id, n: h.n, s: h.s}; hsMode = 'form'; render(); focusHabitName(); return; }
+  if (e.target.closest('#hsnew')) { hsForm = {id: null, n: '', s: 'здоровье'}; hsMode = 'form'; render(); focusHabitName(); return; }
+  if (e.target.closest('#hsedit')) { hsMode = hsMode === 'edit' ? 'list' : 'edit'; render(); return; }
+  if (e.target.closest('#hsclose')) { hsOpen = false; render(); return; }
+  const hc = e.target.closest('[data-hcat]');
+  if (hc) { hsForm.n = document.getElementById('hname').value; hsForm.s = hc.dataset.hcat; render(); focusHabitName(); return; }
+  if (e.target.closest('#hsave')) { saveHabitForm(); return; }
+  if (e.target.closest('#hback')) { hsMode = 'list'; hsForm = null; render(); return; }
+  if (e.target.closest('#hdel')) { archiveHabit(); return; }
   const c=e.target.closest('[data-c]');
   if(c){ picked=c.dataset.c; render(); if(composerOpen()) document.getElementById('draft').focus(); return; }
   const ed=e.target.closest('[data-edit]');
-  if(ed){ editing=+ed.dataset.edit; openComposer(wins[editing].t, wins[editing].s, wins[editing].super); return; }
+  if(ed){ const i=+ed.dataset.edit;
+    if (wins[i] && wins[i].h) { unmarkHabit(i); return; }
+    editing=i; openComposer(wins[editing].t, wins[editing].s, wins[editing].super); return; }
   if(e.target.closest('#addbtn')){ editing=null; openComposer('',null,false); return; }
   if(e.target.closest('#superbtn')){ editing=null; openComposer('',null,true); return; }
   if(e.target.id==='save') commit();
@@ -646,7 +845,7 @@ document.addEventListener('click', e=>{
     if (typeof deleteWin==='function' && gone && gone.id) deleteWin(gone.id);
     closeComposer(); return;
   }
-  if(e.target.closest('#calbtn')){ calMonth=new Date(anchor); document.getElementById('veil').classList.add('on'); renderCal(); return; }
+  if(e.target.closest('#calbtn') || e.target.closest('#title')){ calMonth=new Date(anchor); document.getElementById('veil').classList.add('on'); renderCal(); return; }
   if(e.target.id==='mclose' || e.target.id==='veil'){ document.getElementById('veil').classList.remove('on'); return; }
   if(e.target.closest('#mprev')){ calMonth.setMonth(calMonth.getMonth()-1); renderCal(); return; }
   if(e.target.closest('#mnext')){ calMonth.setMonth(calMonth.getMonth()+1); renderCal(); return; }
@@ -654,6 +853,11 @@ document.addEventListener('click', e=>{
   if(p){ period=+p.dataset.p; renderCal(); render(); return; }
   const day=e.target.closest('[data-day]');
   if(day){ anchor=startOfDay(new Date(day.dataset.day)); renderCal(); render(); return; }
+});
+document.addEventListener('keydown', e=>{
+  if (e.target.id !== 'hname') return;
+  if (e.key === 'Enter') saveHabitForm();
+  if (e.key === 'Escape') { hsMode = 'list'; hsForm = null; render(); }
 });
 document.getElementById('draft').addEventListener('keydown', e=>{
   if(e.key==='Enter') commit();
@@ -672,7 +876,7 @@ function paintAuth(){
   const bar = document.getElementById('authbar');
   if (!bar) return;
   if (typeof user !== 'undefined' && user) {
-    const pending = wins.filter(w => !w.synced).length;
+    const pending = wins.filter(w => !w.synced).length + habits.filter(h => !h.synced).length;
     bar.className = 'authbar in';
     bar.innerHTML = `<span class="dot"></span>${user.email}
       ${syncing ? '<span>синхронизация…</span>' : (pending ? `<span>ждут отправки: ${pending}</span>` : '<span>всё сохранено</span>')}
