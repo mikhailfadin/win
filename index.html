@@ -27,6 +27,7 @@
   --mid:#fffbe8; --mid-hov:#fff6d0;
   --del-br:#f2a49d; --del-fg:#d9503f;
   --shadow:rgba(0,0,0,.18); --veil:rgba(40,38,30,.42); --modal:#fdfbf0;
+  --yr0:#e7e5d7; --yr1:#c6ebd0; --yr2:#86d6a0; --yr3:#3fbf6a; --yr4:#178f45;
 }
 [data-theme="dark"]{
   color-scheme:dark;
@@ -38,6 +39,7 @@
   --mid:#2c2718; --mid-hov:#38311e;
   --del-br:#7a3a35; --del-fg:#ff8375;
   --shadow:rgba(0,0,0,.55); --veil:rgba(6,6,4,.62); --modal:#27261f;
+  --yr0:#34332c; --yr1:#1f4a2e; --yr2:#2a7a48; --yr3:#36a862; --yr4:#56e07a;
 }
 body{
   background:var(--bg); min-height:100vh; display:flex; justify-content:center;
@@ -195,6 +197,73 @@ h1{font-size:44px;line-height:1.05;letter-spacing:.5px}
 .hs-foot span{cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .hs-foot span:hover{color:var(--ink)}
 
+/* ── нижние ссылки и экраны «Путь победителя» / «Счётчик побед» ── */
+.links{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:2px}
+.links button{display:flex;align-items:center;justify-content:center;gap:8px;border:2.5px solid var(--hair);border-radius:22px;
+  background:var(--card);color:var(--ink);font:inherit;font-size:16px;padding:10px;cursor:pointer;transition:border-color .12s}
+.links button:hover{border-color:var(--soft)}
+.links svg{width:19px;height:19px;flex:none}
+.screen{position:fixed;inset:0;z-index:60;background:var(--bg);overflow-y:auto;padding:22px 14px 40px}
+.screen-in{max-width:900px;margin:0 auto;background:var(--paper);border-radius:26px;padding:20px 26px 30px;
+  box-shadow:0 20px 54px var(--shadow);display:flex;flex-direction:column;gap:18px}
+.screen-top{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px}
+.screen-top h2{font-size:28px;text-align:center}
+.screen-top button{font:inherit;font-size:15px;border:2px solid var(--hair);background:var(--card);color:var(--ink);
+  border-radius:18px;padding:6px 14px;cursor:pointer}
+.screen-top span{width:92px}
+.scrbody{display:flex;flex-direction:column;gap:16px}
+.way{background:var(--card);border:2px solid var(--hair);border-radius:20px;padding:16px 18px}
+.way h3{font-size:19px;margin-bottom:6px}
+.way p{font-size:15.5px;line-height:1.5;max-width:64ch}
+.lvrow1{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.lvrow1 svg{width:58px;height:58px;overflow:visible}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.pill{border:2px solid;border-radius:14px;padding:4px 11px;font-size:13.5px;font-weight:700}
+.st-sec{display:flex;flex-direction:column;gap:10px}
+.st-sec h3{font-size:19px}
+.st-sec h3 small{font-size:13px;color:var(--soft);font-weight:400;margin-left:6px}
+.muted{color:var(--soft);font-size:14.5px}
+.per{display:inline-flex;background:var(--track);border-radius:18px;padding:3px;gap:3px;align-self:flex-start}
+.per span{padding:6px 14px;border-radius:15px;font-size:14px;color:var(--soft);cursor:pointer}
+.per span.on{background:var(--btn);color:var(--btn-fg);font-weight:700}
+.cmp{display:flex;align-items:baseline;gap:10px 14px;flex-wrap:wrap}
+.cmp .big-n{font-size:46px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.cmp .lbl{color:var(--soft);font-size:15px}
+.cmp .up{color:var(--ok);font-size:22px} .cmp .down{color:var(--del-fg);font-size:22px}
+.sbar{display:grid;grid-template-columns:132px 1fr 44px;align-items:center;gap:10px;font-size:15px}
+.sname{display:flex;align-items:center;gap:7px;white-space:nowrap}
+.sname svg{width:17px;height:17px;flex:none}
+.strack{height:12px;border-radius:7px;background:var(--track);overflow:hidden}
+.strack i{display:block;height:100%;border-radius:7px}
+.sbar b{text-align:right;font-variant-numeric:tabular-nums}
+.hcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:10px}
+.hcard{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:2px solid var(--hair);border-radius:18px;padding:12px 14px}
+.hcard>svg{width:64px;height:64px;flex:none;overflow:visible}
+.hinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.hinfo b{font-size:16px}
+.hinfo small{color:var(--soft);font-size:12.5px}
+.hnums{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--soft)}
+.hnums span{display:flex;flex-direction:column;line-height:1.2}
+.hnums em{font-style:normal;font-weight:700;font-size:19px;color:var(--ink);font-variant-numeric:tabular-nums}
+.hnext{font-size:13.5px;font-weight:700;color:var(--ok)}
+.ysum{font-size:14.5px;color:var(--soft)}
+.ysum b{color:var(--ink)}
+.year{display:flex;gap:6px}
+.ywd{display:grid;grid-template-rows:16px repeat(7,12px);gap:3px;font-size:10px;color:var(--soft);line-height:12px}
+.year-scroll{overflow-x:auto;padding-bottom:4px;min-width:0}
+.ymonths{position:relative;height:16px;font-size:10.5px;color:var(--soft)}
+.ymonths span{position:absolute;top:0;white-space:nowrap}
+.ygrid{display:grid;grid-template-rows:repeat(7,12px);grid-auto-flow:column;grid-auto-columns:12px;gap:3px}
+.ygrid i{width:12px;height:12px;border-radius:3px}
+.y0{background:var(--yr0)}.y1{background:var(--yr1)}.y2{background:var(--yr2)}.y3{background:var(--yr3)}.y4{background:var(--yr4)}
+.ylegend{display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--soft)}
+.ylegend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.feed{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr));gap:8px;max-height:430px;overflow-y:auto;align-content:start}
+.feed-row{display:flex;gap:10px;align-items:center;background:var(--card);border:2px solid var(--hair);border-radius:16px;padding:8px 12px}
+.feed-row svg{width:42px;height:42px;flex:none;overflow:visible}
+.feed-row b{display:block;font-size:15px;line-height:1.25}
+.feed-row small{font-size:12.5px;color:var(--soft)}
+
 /* ── ввод ── */
 .composer{display:none;flex-direction:column;gap:11px}
 .composer.on{display:flex}
@@ -267,6 +336,23 @@ input::placeholder{color:var(--soft)}
   .hrow .nm small{font-size:11px}
   .hrow .st{font-size:12px}
   .hs-title{font-size:17px}
+  .links{gap:8px}
+  .links button{font-size:13.5px;padding:9px 6px;gap:6px;border-width:2px}
+  .links svg{width:16px;height:16px}
+  .screen{padding:calc(10px + env(safe-area-inset-top)) 8px 24px}
+  .screen-in{padding:14px 14px 22px;border-radius:22px;gap:14px}
+  .screen-top h2{font-size:21px}
+  .screen-top span{width:0}
+  .screen-top button{font-size:13px;padding:5px 10px}
+  .way{padding:13px 14px}
+  .way h3{font-size:16.5px}
+  .way p{font-size:14px}
+  .lvrow1 svg{width:46px;height:46px}
+  .sbar{grid-template-columns:104px 1fr 34px;font-size:13.5px;gap:8px}
+  .hcards{grid-template-columns:1fr}
+  .hcard>svg{width:52px;height:52px}
+  .cmp .big-n{font-size:38px}
+
   .themebtn{top:9px;right:10px;width:32px;height:32px}
   .themebtn svg{width:17px;height:17px}
   .gauge{gap:9px}
@@ -388,6 +474,20 @@ input::placeholder{color:var(--soft)}
         <path d="M8 2.5l1 2M16 2.5l-1 2M12 1v1.6" stroke="#c99700" stroke-width="1.6" stroke-linecap="round"/></svg>
       Добавить суперпобеду
     </button>
+  </div>
+
+  <div class="links" id="links">
+    <button id="waybtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>Путь победителя</button>
+    <button id="statsbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round">
+      <path d="M5 20v-8M11 20V5M17 20v-5M3 20h18"/></svg>Счётчик побед</button>
+  </div>
+</div>
+
+<div class="screen" id="screen" hidden>
+  <div class="screen-in">
+    <div class="screen-top"><button id="scrback">‹ Назад</button><h2 id="scrtitle"></h2><span></span></div>
+    <div class="scrbody" id="scrbody"></div>
   </div>
 </div>
 
@@ -690,6 +790,147 @@ function renderHabitSheet(){
     <div class="hs-foot">${live.length ? `<span id="hsedit">${edit ? 'готово' : 'изменить список'}</span>` : ''}<span id="hsclose">закрыть</span></div>`;
 }
 
+// ── экраны «Путь победителя» и «Счётчик побед» ──
+let scr = null, statsPer = 'month';
+const MONTHS_GEN = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+const MONTHS_SHORT = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+const NEXT_LV = ['', 'до улыбки', 'до смеха', 'до бойца', 'до золота'];
+
+function openScreen(which){
+  scr = which;
+  document.getElementById('screen').hidden = false;
+  document.body.style.overflow = 'hidden';
+  renderScreen();
+  document.getElementById('screen').scrollTop = 0;
+}
+function closeScreen(){ scr = null; document.getElementById('screen').hidden = true; document.body.style.overflow = ''; }
+function renderScreen(){
+  if (!scr) return;
+  document.getElementById('scrtitle').textContent = scr === 'way' ? 'Путь победителя' : 'Счётчик побед';
+  document.getElementById('scrbody').innerHTML = scr === 'way' ? wayHTML() : statsHTML();
+  const y = document.querySelector('.year-scroll');
+  if (y) y.scrollLeft = y.scrollWidth;
+}
+function addDays(d, n){ const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function winsIn(a, b){ return wins.filter(w => { const t = new Date(w.d); return t >= a && t < b; }); }
+function fmtNum(x){ return x.toLocaleString('ru-RU', {maximumFractionDigits: 1}); }
+function winsWord(n){ const a = n % 10, b = n % 100;
+  return a === 1 && b !== 11 ? 'победа' : a >= 2 && a <= 4 && (b < 12 || b > 14) ? 'победы' : 'побед'; }
+function catIcon(c, col, size){
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="${col}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+    ${size ? `width="${size}" height="${size}"` : ''}>${c.ic}</svg>`;
+}
+
+function wayHTML(){
+  const pills = GRADES.map((x, i) => { const c = isDark() ? x.dc : x.c, t = isDark() ? x.dt : x.t;
+    return `<span class="pill" style="background:${c}22;border-color:${c};color:${t}">${['0–2','3–4','5–7','8+'][i]} · ${x.label}</span>`; }).join('');
+  const lv = [1, 7, 21, 90, 180].map(n => habitStar(n, cat('здоровье'))).join('');
+  const card = (t, p, extra) => `<div class="way"><h3>${t}</h3><p>${p}</p>${extra || ''}</div>`;
+  return card('Победа — это любой сделанный шаг',
+      'Не только 50 000 ₽ и новый клиент. Встал вовремя, позвонил отцу, закрыл хвост — это тоже победы. Записал победу — зажглась звезда. Из мелких побед складывается характер.')
+    + card('Суперпобеда — одна в день',
+      'Это то, чем будешь гордиться через год. Не ставь её каждый день — иначе золото обесценится.',
+      `<div class="lvrow1">${star(SUPER_FILL, SUPER, {super:true})}</div>`)
+    + card('Шкала дня', 'Цель не рекорд, а не опускаться ниже «уже неплохо».', `<div class="pills">${pills}</div>`)
+    + card('Привычка растёт, пока ты её держишь',
+      'Каждый день подряд прибавляет единицу к серии. 7 дней — звезда проснулась и улыбается. 21 — смеётся. 90 — становится бойцом. 180 — боец в золоте.',
+      `<div class="lvrow1">${lv}</div>`)
+    + card('Пропуск — не конец',
+      'Пропустил день — серия откатывается на уровень ниже, а не в ноль. Месяц работы из-за одного срыва не сгорает. Правило простое: не пропускай два дня подряд.')
+    + card('Как не бросить',
+      'Записывай победу сразу, пока помнишь. Вечером открой привычки и отметь, что сделал. Не придумывай победы ради шкалы: звезда должна что-то значить.');
+}
+
+function periodRanges(){
+  const today = startOfDay(new Date()), end = addDays(today, 1), y = today.getFullYear();
+  if (statsPer === 'week')
+    return {a: addDays(today, -6), b: end, pa: addDays(today, -13), pb: addDays(today, -6), cur: 'за 7 дней', prev: 'к прошлым 7 дням'};
+  if (statsPer === 'year')
+    return {a: new Date(y, 0, 1), b: end, pa: new Date(y - 1, 0, 1),
+            pb: addDays(new Date(y - 1, today.getMonth(), today.getDate()), 1), cur: 'с начала года', prev: `к тому же периоду ${y - 1} года`};
+  const pa = new Date(y, today.getMonth() - 1, 1);
+  const lastPrev = new Date(y, today.getMonth(), 0).getDate();
+  return {a: new Date(y, today.getMonth(), 1), b: end, pa,
+          pb: addDays(new Date(pa.getFullYear(), pa.getMonth(), Math.min(today.getDate(), lastPrev)), 1),
+          cur: 'с 1 ' + MONTHS_GEN[today.getMonth()], prev: 'к тем же дням ' + MONTHS_GEN[pa.getMonth()]};
+}
+function habitStats(h){
+  const today = startOfDay(new Date()).getTime();
+  const days = [...new Set(wins.filter(w => w.h === h.id).map(w => startOfDay(new Date(w.d)).getTime()))].sort((a, b) => a - b);
+  const created = h.created ? startOfDay(new Date(h.created)).getTime() : today;
+  const start = Math.min(created, days.length ? days[0] : created);
+  const total = Math.round((today - start) / 864e5) + 1;
+  let best = 0, run = 0, prev = null;
+  for (const t of days) { run = prev !== null && Math.round((t - prev) / 864e5) === 1 ? run + 1 : 1; best = Math.max(best, run); prev = t; }
+  return {total, done: days.length, pct: Math.round(days.length / total * 100), best, now: streakNow(h.id), since: new Date(start)};
+}
+function yearHTML(){
+  const today = startOfDay(new Date());
+  let start = addDays(today, -364);
+  while ((start.getDay() + 6) % 7) start = addDays(start, -1);
+  const cnt = {};
+  wins.forEach(w => { const k = dayKey(w.d); cnt[k] = (cnt[k] || 0) + 1; });
+  let cells = '', months = '', col = 0, lastM = -1, total = 0, active = 0, best = null;
+  for (let d = new Date(start); d <= today; d = addDays(d, 1)) {
+    if ((d.getDay() + 6) % 7 === 0) {
+      if (d.getMonth() !== lastM) { months += `<span style="left:${col * 15}px">${MONTHS_SHORT[d.getMonth()]}</span>`; lastM = d.getMonth(); }
+      col++;
+    }
+    const n = cnt[dayKey(d)] || 0, lv = n >= 8 ? 4 : n >= 5 ? 3 : n >= 3 ? 2 : n >= 1 ? 1 : 0;
+    if (d > addDays(today, -365)) { total += n; if (n) active++; if (!best || n > best.n) best = {n, d: new Date(d)}; }
+    cells += `<i class="y${lv}" title="${d.getDate()} ${MONTHS_GEN[d.getMonth()]}: ${n} ${winsWord(n)}"></i>`;
+  }
+  const wd = ['', 'пн', '', 'ср', '', 'пт', '', ''].map(x => `<span>${x}</span>`).join('');
+  return `<div class="ysum">За год <b>${total}</b> ${winsWord(total)} · дней с победами <b>${active}</b> из 365
+      ${best && best.n ? ` · рекорд — <b>${best.n}</b> ${best.d.getDate()} ${MONTHS_GEN[best.d.getMonth()]}` : ''}</div>
+    <div class="year"><div class="ywd">${wd}</div>
+      <div class="year-scroll"><div class="ymonths" style="width:${col * 15}px">${months}</div><div class="ygrid">${cells}</div></div></div>
+    <div class="ylegend">меньше <i class="y0"></i><i class="y1"></i><i class="y2"></i><i class="y3"></i><i class="y4"></i> больше
+      <span style="margin-left:8px">— те же пороги, что у шкалы дня</span></div>`;
+}
+function statsHTML(){
+  const r = periodRanges(), cur = winsIn(r.a, r.b), prev = winsIn(r.pa, r.pb);
+  const diff = prev.length ? Math.round((cur.length - prev.length) / prev.length * 100) : null;
+  const trend = diff === null ? '<span class="lbl">раньше побед не было — сравнивать не с чем</span>'
+    : `<b class="${diff >= 0 ? 'up' : 'down'}">${diff > 0 ? '+' : diff < 0 ? '−' : ''}${Math.abs(diff)}%</b>
+       <span class="lbl">${r.prev} (${prev.length})</span>`;
+  const per = [['week','Неделя'], ['month','Месяц'], ['year','Год']]
+    .map(([k, t]) => `<span data-per="${k}" class="${statsPer === k ? 'on' : ''}">${t}</span>`).join('');
+
+  const by = {};
+  cur.forEach(w => { by[w.s] = (by[w.s] || 0) + 1; });
+  const rows = CATS.map(c => ({c, n: by[c.id] || 0})).filter(x => x.n).sort((a, b) => b.n - a.n);
+  const max = rows.length ? rows[0].n : 1;
+  const bars = rows.map(x => { const t = tint(x.c);
+    return `<div class="sbar"><span class="sname">${catIcon(x.c, t.c)}${x.c.name}</span>
+      <div class="strack"><i style="width:${Math.max(3, x.n / max * 100)}%;background:${t.c}"></i></div><b>${x.n}</b></div>`; }).join('')
+    || '<p class="muted">За этот период побед пока нет.</p>';
+
+  const hc = habits.filter(h => !h.archived).map(h => {
+    const s = habitStats(h), c = cat(h.s), L = lvlOf(s.now), left = L >= 1 && L <= 4 ? LV_START[L] - s.now : 0;
+    const next = s.now === 0 ? 'отметь сегодня — звезда проснётся'
+      : L >= 5 ? 'высший уровень — боец в золоте' : `${NEXT_LV[L]} — ${left} ${dayWord(left)}`;
+    return `<div class="hcard">${habitStar(Math.max(1, s.now), c, s.now === 0)}
+      <div class="hinfo"><b>${esc(h.n)}</b><small>${c.name} · с ${s.since.getDate()} ${MONTHS_GEN[s.since.getMonth()]}</small>
+        <div class="hnums"><span><em>${s.now}</em>серия</span><span><em>${s.best}</em>рекорд подряд</span>
+          <span><em>${s.pct}%</em>${s.done} из ${s.total} ${dayWord(s.total)}</span></div>
+        <div class="hnext">${next}</div></div></div>`; }).join('')
+    || '<p class="muted">Привычек пока нет — заведи первую кнопкой «Добавить привычку».</p>';
+
+  const feed = wins.filter(w => w.super).sort((a, b) => new Date(b.d) - new Date(a.d)).map(w => {
+    const d = new Date(w.d), c = cat(w.s);
+    return `<div class="feed-row">${star(SUPER_FILL, SUPER, {super:true})}<div><b>${esc(w.t)}</b>
+      <small>${d.getDate()} ${MONTHS_GEN[d.getMonth()]} ${d.getFullYear()} · <span style="color:${tint(c).c}">${c.name}</span></small></div></div>`; }).join('')
+    || '<p class="muted">Суперпобед пока нет. Первая появится здесь.</p>';
+
+  return `<section class="st-sec"><div class="per">${per}</div>
+      <div class="cmp"><span class="big-n">${cur.length}</span><span class="lbl">${winsWord(cur.length)} ${r.cur}</span>${trend}</div></section>
+    <section class="st-sec"><h3>Победы по сферам <small>${r.cur}</small></h3>${bars}</section>
+    <section class="st-sec"><h3>Привычки</h3><div class="hcards">${hc}</div></section>
+    <section class="st-sec"><h3>Год клетками</h3>${yearHTML()}</section>
+    <section class="st-sec"><h3>Лента суперпобед</h3><div class="feed">${feed}</div></section>`;
+}
+
 // ── ступени шкалы: пороги растянуты под длину периода ──
 const GRADES = [
   {label:'Есть куда расти',  c:'#a8a69a', t:'#8d8d86', dc:'#5c5a50', dt:'#918f83'},
@@ -769,6 +1010,7 @@ function render(){
   document.getElementById('pair').style.display     = solo && !busy ? '' : 'none';
   document.getElementById('superbtn').style.display = solo && !busy ? '' : 'none';
   renderHabitSheet();
+  if (scr) renderScreen();
   if (typeof paintAuth === 'function') paintAuth();
   justAdded = null;
 }
@@ -841,6 +1083,11 @@ function renderCal(){
 }
 
 document.addEventListener('click', e=>{
+  if (e.target.closest('#waybtn')) { openScreen('way'); return; }
+  if (e.target.closest('#statsbtn')) { openScreen('stats'); return; }
+  if (e.target.closest('#scrback')) { closeScreen(); return; }
+  const per = e.target.closest('[data-per]');
+  if (per) { statsPer = per.dataset.per; renderScreen(); return; }
   if (e.target.closest('#habitbtn')) { hsOpen = true; hsMode = 'list'; hsForm = null; render(); return; }
   const hm = e.target.closest('[data-hmark]');
   if (hm) { markHabit(hm.dataset.hmark); return; }
@@ -881,6 +1128,7 @@ document.addEventListener('click', e=>{
   if(day){ anchor=startOfDay(new Date(day.dataset.day)); renderCal(); render(); return; }
 });
 document.addEventListener('keydown', e=>{
+  if (e.key === 'Escape' && scr) { closeScreen(); return; }
   if (e.target.id !== 'hname') return;
   if (e.key === 'Enter') saveHabitForm();
   if (e.key === 'Escape') { hsMode = 'list'; hsForm = null; render(); }
