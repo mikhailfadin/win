@@ -124,4 +124,8 @@ async function signIn(email){
     options: { emailRedirectTo: location.href.split('#')[0] }
   });
 }
+async function verifyCode(email, code){
+  if (!sb) return { error: { message: 'облако недоступно' } };
+  return sb.auth.verifyOtp({ email, token: code, type: 'email' });
+}
 async function signOut(){ if (sb) await sb.auth.signOut(); }

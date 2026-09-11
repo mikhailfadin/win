@@ -75,6 +75,13 @@ b,strong,h1,.bold{font-family:'Balsamiq Sans',sans-serif;font-weight:700}
 .authbar input{width:210px;padding:6px 11px;font-size:13px;border-radius:14px;
                 border:2px solid var(--hair);background:var(--card);color:var(--ink)}
 .authbar .msg{color:var(--ok)}
+.authbar{flex-wrap:wrap}
+.authbar #mail,.authbar #code{font-size:16px}
+.authbar #code{width:150px;text-align:center;letter-spacing:.18em;font-variant-numeric:tabular-nums}
+.authbar #code::placeholder{letter-spacing:normal}
+.authbar .err{color:#e63946;flex-basis:100%;text-align:center}
+.authbar .hint{color:var(--soft);font-size:12.5px;flex-basis:100%;text-align:center}
+.authbar .hint u{cursor:pointer}
 
 /* ── шапка ── */
 .top{display:flex;flex-direction:column;align-items:center;gap:3px}
@@ -1212,42 +1219,64 @@ function paintAuth(){
   }
 }
 
+// ── вход по коду из письма: почта → 6 цифр → внутри. Работает в любом браузере и в приложении на iPhone ──
+let authMail = '';
+function normCode(s){ return String(s || '').replace(/\D/g, ''); }
+function authErrText(m){
+  m = String(m || '');
+  const wait = m.match(/after (\d+) seconds/);
+  if (wait) return {txt: `Код уже отправлен. Новый можно запросить через ${wait[1]} сек.`, hint: 'Проверь письмо, которое уже пришло, и папку «Спам».'};
+  if (/rate|limit/i.test(m)) return {txt: 'Слишком много писем подряд. Подожди немного и попробуй снова.', hint: ''};
+  if (/token|expired|otp/i.test(m)) return {txt: 'Код не подошёл или устарел. Проверь цифры или запроси новый.', hint: ''};
+  if (/invalid|format|email/i.test(m)) return {txt: 'Почта введена с ошибкой — проверь адрес.', hint: ''};
+  return {txt: m || 'Не получилось. Попробуй ещё раз.', hint: ''};
+}
+function authErr(e){ return e ? `<span class="err">${esc(e.txt)}</span>${e.hint ? `<span class="hint">${esc(e.hint)}</span>` : ''}` : ''; }
+function showMailForm(err){
+  const bar = document.getElementById('authbar');
+  bar.className = 'authbar';
+  bar.innerHTML = `${authErr(err)}<input id="mail" type="email" placeholder="почта" autocomplete="email" value="${esc(authMail)}">
+    <button id="sendcode">прислать код</button><button id="cancelin" class="ghost">отмена</button>`;
+  document.getElementById('mail').focus();
+}
+function showCodeForm(err){
+  const bar = document.getElementById('authbar');
+  bar.className = 'authbar';
+  bar.innerHTML = `<span class="msg">Код отправлен на ${esc(authMail)}</span>
+    <input id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="12" placeholder="код из письма">
+    <button id="checkcode">войти</button>${authErr(err)}
+    <span class="hint">Письма нет? Загляни в «Спам» · <u id="resend">прислать ещё раз</u> · <u id="cancelin">другая почта</u></span>`;
+  document.getElementById('code').focus();
+}
+async function sendCode(again){
+  const mail = again || (document.getElementById('mail').value || '').trim();
+  if (!mail) return;
+  authMail = mail;
+  document.getElementById('authbar').innerHTML = '<span>отправляю…</span>';
+  const { error } = await signIn(mail);
+  if (error) { const e = authErrText(error.message); return /after \d+ seconds/.test(error.message) ? showCodeForm(e) : showMailForm(e); }
+  showCodeForm();
+}
+async function checkCode(){
+  const code = normCode(document.getElementById('code').value);
+  if (code.length < 6) return showCodeForm({txt: 'Введи все цифры из письма.', hint: ''});
+  document.getElementById('authbar').innerHTML = '<span>проверяю…</span>';
+  const { error } = await verifyCode(authMail, code);
+  if (error) return showCodeForm(authErrText(error.message));
+  authMail = '';
+}
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (e.target.id === 'mail') sendCode();
+  if (e.target.id === 'code') checkCode();
+});
+
 document.addEventListener('click', async e => {
-  if (e.target.id === 'inbtn') {
-    const bar = document.getElementById('authbar');
-    bar.innerHTML = `<input id="mail" type="email" placeholder="почта" autocomplete="email">
-      <button id="sendlink">прислать ссылку</button><button id="cancelin">отмена</button>`;
-    document.getElementById('mail').focus();
-    return;
-  }
-  if (e.target.id === 'cancelin') { paintAuth(); return; }
-  if (e.target.id === 'sendlink') {
-    const mail = (document.getElementById('mail').value || '').trim();
-    if (!mail) return;
-    const bar = document.getElementById('authbar');
-    bar.innerHTML = '<span>отправляю…</span>';
-    const { error } = await signIn(mail);
-    if (error) {
-      const m = String(error.message || '');
-      let txt = m, hint = '';
-      const wait = m.match(/after (\d+) seconds/);
-      if (wait) {
-        txt = `Письмо уже отправлено. Следующее можно запросить через ${wait[1]} сек.`;
-        hint = 'Проще: открой письмо, которое уже пришло, прямо на этом устройстве — ссылка сработает здесь.';
-      } else if (/invalid|email/i.test(m)) {
-        txt = 'Почта введена с ошибкой — проверь адрес.';
-      } else if (/rate|limit/i.test(m)) {
-        txt = 'Слишком много запросов подряд. Подожди минуту.';
-      }
-      bar.innerHTML = `<span style="color:#e63946">${txt}</span>
-        ${hint ? `<span style="color:var(--soft);font-size:12.5px">${hint}</span>` : ''}
-        <button id="inbtn">ещё раз</button>`;
-    } else {
-      bar.innerHTML = `<span class="msg">Письмо ушло на ${mail}. Открой его и нажми ссылку внутри —
-        именно на том устройстве, где хочешь войти.</span>`;
-    }
-    return;
-  }
+  if (e.target.id === 'inbtn') { showMailForm(); return; }
+  if (e.target.id === 'cancelin') { authMail = ''; paintAuth(); return; }
+  if (e.target.id === 'sendcode') { await sendCode(); return; }
+  if (e.target.id === 'resend') { await sendCode(authMail); return; }
+  if (e.target.id === 'checkcode') { await checkCode(); return; }
   if (e.target.id === 'demobtn') { startDemo(); return; }
   if (e.target.id === 'demoexit') { location.reload(); return; }
   if (e.target.id === 'outbtn') {
