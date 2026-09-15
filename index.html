@@ -1447,8 +1447,8 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
   try { saved = localStorage.getItem('pobedy_theme'); } catch(err){}
   if (!saved) { applyTheme(e.matches ? 'dark' : 'light'); render(); }
 });
-// ── боковые поля: приглушённые звёзды медленно плывут; навёл — загорается, нажал — старая суперпобеда или инсайт ──
-const DRIFT_MIN_FIELD = 150, DRIFT_SIZE = 64, DRIFT_SPEED = 11;
+// ── боковые поля: приглушённые звёзды летают по прямой и отскакивают от краёв, как заставка; навёл — загорается, нажал — старая суперпобеда или инсайт ──
+const DRIFT_MIN_FIELD = 150, DRIFT_SIZE = 64, DRIFT_SPEED = 40;
 const drift = {on: false, theme: null, raf: 0, last: 0, stars: [],
   reduce: matchMedia('(prefers-reduced-motion: reduce)').matches};
 // что показать: давно не показанное (неделя), среди них — самое давнее; не одно и то же подряд
@@ -1467,7 +1467,7 @@ function driftField(side){
 }
 function driftBounds(s){
   const f = driftField(s.side);
-  return {f, minX: 12, maxX: Math.max(12, f.w - DRIFT_SIZE - 16), minY: 80, maxY: Math.max(80, innerHeight - DRIFT_SIZE - 110)};
+  return {f, minX: 10, maxX: Math.max(10, f.w - DRIFT_SIZE - 10), minY: 14, maxY: Math.max(14, innerHeight - DRIFT_SIZE - 34)};
 }
 function driftPlace(s){
   const b = driftBounds(s);
@@ -1485,10 +1485,9 @@ function driftStep(t){
     if (s.el.hidden || s.hover || !s.card.hidden) return;
     moving = true;
     const b = driftBounds(s);
-    s.ang += (Math.random() - 0.5) * 2.4 * dt;
-    s.x += Math.cos(s.ang) * DRIFT_SPEED * dt; s.y += Math.sin(s.ang) * DRIFT_SPEED * dt;
-    if (s.x < b.minX || s.x > b.maxX) s.ang = Math.PI - s.ang;
-    if (s.y < b.minY || s.y > b.maxY) s.ang = -s.ang;
+    s.x += s.vx * dt; s.y += s.vy * dt;
+    if (s.x <= b.minX) s.vx = Math.abs(s.vx); else if (s.x >= b.maxX) s.vx = -Math.abs(s.vx);
+    if (s.y <= b.minY) s.vy = Math.abs(s.vy); else if (s.y >= b.maxY) s.vy = -Math.abs(s.vy);
     driftPlace(s);
   });
   if (moving) drift.raf = requestAnimationFrame(driftStep);
@@ -1545,7 +1544,8 @@ function driftInit(){
     const card = document.createElement('div');
     card.className = 'dcard ' + kind; card.hidden = true;
     document.body.append(el, card);
-    const s = {kind, side, el, card, x: 0, y: 0, ang: Math.random() * Math.PI * 2, hover: false, placed: false};
+    const a = (28 + Math.random() * 34) * Math.PI / 180, sx = Math.random() < .5 ? -1 : 1, sy = Math.random() < .5 ? -1 : 1;
+    const s = {kind, side, el, card, x: 0, y: 0, vx: sx * Math.cos(a) * DRIFT_SPEED, vy: sy * Math.sin(a) * DRIFT_SPEED, hover: false, placed: false};
     el.addEventListener('mouseenter', () => { s.hover = true; el.classList.add('lit'); });
     el.addEventListener('mouseleave', () => { s.hover = false; if (s.card.hidden) el.classList.remove('lit'); driftLoop(); });
     el.querySelector('.drift-star').addEventListener('click', () => driftShow(s));
