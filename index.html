@@ -297,9 +297,9 @@ h1{font-size:44px;line-height:1.05;letter-spacing:.5px}
 .feed-row b{display:block;font-size:15px;line-height:1.25}
 .feed-row small{font-size:12.5px;color:var(--soft)}
 
-/* ── боковые поля на компьютере: звёзды «Вспомни суперпобеду» и «Вспомни инсайт» ── */
+/* ── боковые поля на компьютере: звёзды «Вспомнить суперпобеду» и «Вспомнить инсайт» ── */
 .drift{position:fixed;left:0;top:0;z-index:40;display:flex;flex-direction:column;align-items:center;gap:4px;
-  will-change:transform;opacity:.34;filter:saturate(.45);transition:opacity .35s,filter .35s}
+  will-change:transform;opacity:.2;filter:grayscale(1);transition:opacity .35s,filter .35s}
 .drift[hidden],.dcard[hidden]{display:none}
 .drift.lit{opacity:1;filter:none}
 .drift-star{background:none;border:0;padding:0;cursor:pointer;width:64px;height:64px;animation:dbob 6s ease-in-out infinite;transition:transform .25s}
@@ -1538,7 +1538,7 @@ function driftShow(s){
 }
 function driftInit(){
   if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-  [['super', 'left', 'Вспомни суперпобеду'], ['insight', 'right', 'Вспомни инсайт']].forEach(([kind, side, label]) => {
+  [['super', 'left', 'Вспомнить суперпобеду'], ['insight', 'right', 'Вспомнить инсайт']].forEach(([kind, side, label]) => {
     const el = document.createElement('div');
     el.className = 'drift ' + kind; el.hidden = true;
     el.innerHTML = `<button class="drift-star" aria-label="${label}"></button><span class="drift-lbl">${label}</span>`;
