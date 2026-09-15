@@ -297,6 +297,37 @@ h1{font-size:44px;line-height:1.05;letter-spacing:.5px}
 .feed-row b{display:block;font-size:15px;line-height:1.25}
 .feed-row small{font-size:12.5px;color:var(--soft)}
 
+/* ── боковые поля на компьютере: звёзды «Вспомни суперпобеду» и «Вспомни инсайт» ── */
+.drift{position:fixed;left:0;top:0;z-index:40;display:flex;flex-direction:column;align-items:center;gap:4px;
+  will-change:transform;opacity:.34;filter:saturate(.45);transition:opacity .35s,filter .35s}
+.drift[hidden],.dcard[hidden]{display:none}
+.drift.lit{opacity:1;filter:none}
+.drift-star{background:none;border:0;padding:0;cursor:pointer;width:64px;height:64px;animation:dbob 6s ease-in-out infinite;transition:transform .25s}
+.drift.insight .drift-star{animation-delay:-3s}
+.drift.lit .drift-star{transform:scale(1.15);animation-play-state:paused}
+.drift-star svg{width:64px;height:64px;overflow:visible;display:block}
+.drift-star:focus-visible{outline:3px solid var(--sun2);outline-offset:6px;border-radius:50%}
+.drift-lbl{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;opacity:0;transform:translateY(-4px);transition:.25s;
+  pointer-events:none;background:var(--paper);border:2px solid var(--hair);border-radius:12px;padding:2px 9px}
+.drift.lit .drift-lbl{opacity:1;transform:none}
+@keyframes dbob{0%,100%{translate:0 0}50%{translate:0 -6px}}
+.dcard{position:fixed;z-index:41;background:var(--paper);border:2px solid var(--hair);border-radius:18px;padding:13px 16px 12px;
+  box-shadow:0 14px 34px var(--shadow);color:var(--ink);animation:dpop .2s ease-out}
+.dcard.super{border-color:var(--sun2)}
+.dcard.insight{border-color:var(--ins-br)}
+.dkick{font-size:12.5px;font-weight:700;color:var(--soft);padding-right:22px}
+.dtext{font-size:16px;line-height:1.4;margin:6px 0 10px}
+.dempty{font-size:14px;line-height:1.4;color:var(--soft);margin:6px 0 2px}
+.dfoot{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dfoot small{font-size:12px;color:var(--soft)}
+.dmore{font:inherit;font-size:13px;font-weight:700;border:2px solid var(--hair);background:var(--card);color:var(--ink);border-radius:12px;padding:4px 10px;cursor:pointer}
+.dmore:hover{border-color:var(--soft)}
+.dclose{position:absolute;top:6px;right:8px;border:0;background:none;color:var(--soft);font-size:20px;line-height:1;cursor:pointer;padding:2px 4px}
+.dclose:hover{color:var(--ink)}
+@keyframes dpop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){.drift-star,.dcard{animation:none}}
+@media (max-width:760px){.drift,.dcard{display:none!important}}
+
 html{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 /* ── ввод ── */
 .composer{display:none;flex-direction:column;gap:11px}
@@ -1134,6 +1165,7 @@ function render(){
   renderHabitSheet();
   if (scr) renderScreen();
   if (typeof paintAuth === 'function') paintAuth();
+  if (typeof driftRefresh === 'function') driftRefresh();
   justAdded = null;
 }
 
@@ -1415,8 +1447,122 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
   try { saved = localStorage.getItem('pobedy_theme'); } catch(err){}
   if (!saved) { applyTheme(e.matches ? 'dark' : 'light'); render(); }
 });
+// ── боковые поля: приглушённые звёзды медленно плывут; навёл — загорается, нажал — старая суперпобеда или инсайт ──
+const DRIFT_MIN_FIELD = 150, DRIFT_SIZE = 64, DRIFT_SPEED = 11;
+const drift = {on: false, theme: null, raf: 0, last: 0, stars: [],
+  reduce: matchMedia('(prefers-reduced-motion: reduce)').matches};
+// что показать: давно не показанное (неделя), среди них — самое давнее; не одно и то же подряд
+function recallPick(list, shown, now, rnd){
+  if (!list.length) return null;
+  let pool = list.filter(w => !shown[w.id] || now - shown[w.id] > 7 * 864e5);
+  if (!pool.length) pool = list.slice();
+  pool.sort((a, b) => (shown[a.id] || 0) - (shown[b.id] || 0) || new Date(a.d) - new Date(b.d));
+  const top = pool.slice(0, Math.max(5, Math.ceil(pool.length * 0.3)));
+  return top[Math.floor((rnd || Math.random)() * top.length)];
+}
+function recallShown(){ try { return JSON.parse(localStorage.getItem('pobedy_recall') || '{}') || {}; } catch(e){ return {}; } }
+function driftField(side){
+  const r = document.querySelector('.app').getBoundingClientRect();
+  return side === 'left' ? {x0: 0, w: r.left} : {x0: r.right, w: innerWidth - r.right};
+}
+function driftBounds(s){
+  const f = driftField(s.side);
+  return {f, minX: 12, maxX: Math.max(12, f.w - DRIFT_SIZE - 16), minY: 80, maxY: Math.max(80, innerHeight - DRIFT_SIZE - 110)};
+}
+function driftPlace(s){
+  const b = driftBounds(s);
+  if (!s.placed) { s.x = b.minX + Math.random() * (b.maxX - b.minX); s.y = b.minY + Math.random() * (b.maxY - b.minY); s.placed = true; }
+  s.x = Math.min(b.maxX, Math.max(b.minX, s.x)); s.y = Math.min(b.maxY, Math.max(b.minY, s.y));
+  s.el.style.transform = `translate(${Math.round(b.f.x0 + s.x)}px, ${Math.round(s.y)}px)`;
+}
+function driftStep(t){
+  drift.raf = 0;
+  if (document.hidden || !drift.on) { drift.last = 0; return; }
+  const dt = drift.last ? Math.min(0.05, (t - drift.last) / 1000) : 0;
+  drift.last = t;
+  let moving = false;
+  drift.stars.forEach(s => {
+    if (s.el.hidden || s.hover || !s.card.hidden) return;
+    moving = true;
+    const b = driftBounds(s);
+    s.ang += (Math.random() - 0.5) * 2.4 * dt;
+    s.x += Math.cos(s.ang) * DRIFT_SPEED * dt; s.y += Math.sin(s.ang) * DRIFT_SPEED * dt;
+    if (s.x < b.minX || s.x > b.maxX) s.ang = Math.PI - s.ang;
+    if (s.y < b.minY || s.y > b.maxY) s.ang = -s.ang;
+    driftPlace(s);
+  });
+  if (moving) drift.raf = requestAnimationFrame(driftStep);
+}
+function driftLoop(){ if (!drift.reduce && !drift.raf && !document.hidden) drift.raf = requestAnimationFrame(driftStep); }
+function driftRefresh(){
+  if (!drift.on) return;
+  const theme = currentTheme(), ok = driftField('left').w >= DRIFT_MIN_FIELD;
+  drift.stars.forEach(s => {
+    if (drift.theme !== theme) s.el.querySelector('.drift-star').innerHTML = s.kind === 'super' ? star(SUPER_FILL, SUPER, {super: true}) : insightStar();
+    s.el.hidden = !ok;
+    if (ok) driftPlace(s); else driftHide(s);
+  });
+  drift.theme = theme;
+  if (ok) driftLoop();
+}
+function driftHide(s){ s.card.hidden = true; if (!s.hover) s.el.classList.remove('lit'); driftLoop(); }
+function driftShow(s){
+  const today = startOfDay(new Date());
+  const list = wins.filter(w => (s.kind === 'super' ? w.super : w.ins) && new Date(w.d) < today);
+  const shown = recallShown(), w = recallPick(list, shown, Date.now());
+  const kick = s.kind === 'super' ? '⭐ Суперпобеда' : '✦ Инсайт';
+  if (!w) {
+    s.card.innerHTML = `<button class="dclose" aria-label="Закрыть">×</button><div class="dkick">${kick}</div>
+      <p class="dempty">${s.kind === 'super' ? 'Здесь будут твои суперпобеды из прошлого — отметь первую переключателем «Это суперпобеда дня».'
+        : 'Здесь будут твои инсайты из прошлого — запиши первый кнопкой «Добавить инсайт».'}</p>`;
+  } else {
+    const d = new Date(w.d), meta = s.kind === 'super' ? cat(w.s).name
+      : (INSIGHT_SECS.find(x => x.id === (w.sec || 'жизнь')) || INSIGHT_SECS[0]).name;
+    s.card.innerHTML = `<button class="dclose" aria-label="Закрыть">×</button><div class="dkick">${kick} · ${meta}</div>
+      <p class="dtext">${esc(w.t)}</p>
+      <div class="dfoot"><small>${d.getDate()} ${MONTHS_GEN[d.getMonth()]} ${d.getFullYear()}</small>
+        ${list.length > 1 ? '<button class="dmore">ещё одну</button>' : ''}</div>`;
+    shown[w.id] = Date.now();
+    if (!demoMode) { try { localStorage.setItem('pobedy_recall', JSON.stringify(shown)); } catch(e){} }
+  }
+  s.card.querySelector('.dclose').onclick = () => driftHide(s);
+  const more = s.card.querySelector('.dmore');
+  if (more) { if (s.kind === 'insight') more.textContent = 'ещё один'; more.onclick = () => driftShow(s); }
+  const b = driftBounds(s), cw = Math.min(270, b.f.w - 24);
+  s.card.style.width = cw + 'px';
+  s.card.hidden = false;
+  const ch = s.card.offsetHeight, below = s.y + DRIFT_SIZE + 34;
+  s.card.style.left = Math.round(b.f.x0 + Math.min(b.f.w - cw - 12, Math.max(12, s.x + DRIFT_SIZE / 2 - cw / 2))) + 'px';
+  s.card.style.top = Math.round(below + ch < innerHeight - 12 ? below : Math.max(12, s.y - ch - 12)) + 'px';
+  s.el.classList.add('lit');
+}
+function driftInit(){
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  [['super', 'left', 'Вспомни суперпобеду'], ['insight', 'right', 'Вспомни инсайт']].forEach(([kind, side, label]) => {
+    const el = document.createElement('div');
+    el.className = 'drift ' + kind; el.hidden = true;
+    el.innerHTML = `<button class="drift-star" aria-label="${label}"></button><span class="drift-lbl">${label}</span>`;
+    const card = document.createElement('div');
+    card.className = 'dcard ' + kind; card.hidden = true;
+    document.body.append(el, card);
+    const s = {kind, side, el, card, x: 0, y: 0, ang: Math.random() * Math.PI * 2, hover: false, placed: false};
+    el.addEventListener('mouseenter', () => { s.hover = true; el.classList.add('lit'); });
+    el.addEventListener('mouseleave', () => { s.hover = false; if (s.card.hidden) el.classList.remove('lit'); driftLoop(); });
+    el.querySelector('.drift-star').addEventListener('click', () => driftShow(s));
+    drift.stars.push(s);
+  });
+  document.addEventListener('click', e => drift.stars.forEach(s => {
+    if (!s.card.hidden && !s.card.contains(e.target) && !s.el.contains(e.target)) driftHide(s); }));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') drift.stars.forEach(driftHide); });
+  addEventListener('resize', driftRefresh);
+  document.addEventListener('visibilitychange', driftLoop);
+  drift.on = true;
+  driftRefresh();
+}
 applyTheme(currentTheme());
 render();
+
+driftInit();
 
 if (window.supabase) initCloud();
 </script>
