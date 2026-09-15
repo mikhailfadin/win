@@ -11,10 +11,11 @@ function uid(){
         const r = Math.random()*16|0; return (c==='x'?r:(r&0x3|0x8)).toString(16); }));
 }
 
-const winRow = w => ({ id: w.id || uid(), user_id: user.id, text: w.t, cat: w.s || 'другое',
-                       is_super: !!w.super, happened_at: w.d, habit_id: w.h || null });
-const winFrom = r => ({ id: r.id, t: r.text, s: r.cat, super: r.is_super, d: r.happened_at,
-                        h: r.habit_id || undefined, synced: true });
+const winRow = w => ({ id: w.id || uid(), user_id: user.id, text: w.t, cat: w.ins ? 'другое' : (w.s || 'другое'),
+                       is_super: !!w.super, happened_at: w.d, habit_id: w.h || null,
+                       is_insight: !!w.ins, section: w.ins ? (w.sec || 'жизнь') : null });
+const winFrom = r => ({ id: r.id, t: r.text, s: r.is_insight ? 'инсайт' : r.cat, super: r.is_super, d: r.happened_at,
+                        h: r.habit_id || undefined, ins: r.is_insight || undefined, sec: r.section || undefined, synced: true });
 const habitRow = h => ({ id: h.id, user_id: user.id, name: h.n, cat: h.s || 'другое',
                          archived: !!h.archived, created_at: h.created || new Date().toISOString() });
 const habitFrom = r => ({ id: r.id, n: r.name, s: r.cat, archived: r.archived, created: r.created_at, synced: true });

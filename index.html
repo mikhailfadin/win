@@ -21,7 +21,7 @@
   color-scheme:light;
   --bg:#eceadd; --paper:#fdfbf0; --card:#fff; --hover:#f0eee0; --track:#e7e5d7;
   --ink:#2b2b2b; --soft:#8d8d86; --hair:#c9c7bb; --empty:#c4c2b6;
-  --sun:#ffd93d; --sun2:#ffc400;
+  --sun:#ffd93d; --sun2:#ffc400; --ins-bg:#f1f3f9; --ins-br:#9aa3b8;
   --btn:linear-gradient(180deg,#ffe066,#ffc400); --btn-fg:#2b2b2b; --btn-br:#2b2b2b;
   --auth:#fff6d8; --authin:#eefaf1; --authin-br:#9ad9ae; --ok:#22b455;
   --mid:#fffbe8; --mid-hov:#fff6d0;
@@ -33,7 +33,7 @@
   color-scheme:dark;
   --bg:#100f0d; --paper:#1e1d19; --card:#2a2924; --hover:#34332c; --track:#34332c;
   --ink:#efece0; --soft:#918f83; --hair:#4b4941; --empty:#46443c;
-  --sun:#f2c53b; --sun2:#d9a500;
+  --sun:#f2c53b; --sun2:#d9a500; --ins-bg:#30343f; --ins-br:#c3cbdc;
   --btn:linear-gradient(180deg,#f5cf4d,#dba700); --btn-fg:#2b2411; --btn-br:#6b5410;
   --auth:#3a3018; --authin:#1c3123; --authin-br:#2f6b45; --ok:#3ac96c;
   --mid:#2c2718; --mid-hov:#38311e;
@@ -179,6 +179,28 @@ h1{font-size:44px;line-height:1.05;letter-spacing:.5px}
 .pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
 .pair .big{font-size:22px;padding:14px 8px;gap:10px}
 .btns .mid{width:100%;flex:none}
+.mid.ins{border-color:var(--ins-br);background:var(--ins-bg)}
+.mid.ins:hover{background:var(--ins-bg);filter:brightness(1.05)}
+.supertog{display:flex;align-items:center;gap:10px;border:2.5px dashed var(--sun2);border-radius:18px;padding:10px 14px;cursor:pointer;font-size:16px;user-select:none}
+.supertog span{flex:1}
+.supertog small{color:var(--soft);font-size:12.5px}
+.sw{width:44px;height:26px;border-radius:13px;background:var(--hair);position:relative;transition:.15s;flex:none}
+.sw:after{content:'';position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.15s}
+.supertog.on{border-style:solid;background:#ffd93d1f}
+.supertog.on .sw{background:var(--sun2)}
+.supertog.on .sw:after{left:21px}
+.ins-g{background:var(--card);border:2px solid var(--hair);border-radius:16px;padding:0 14px}
+.ins-g>summary{display:flex;align-items:center;gap:8px;cursor:pointer;padding:11px 0;list-style:none;font-size:16px}
+.ins-g>summary::-webkit-details-marker,.ins-more>summary::-webkit-details-marker{display:none}
+.ins-g>summary span{color:var(--soft);font-size:14px}
+.ins-g>summary:after{content:'▾';margin-left:auto;color:var(--soft);transition:transform .15s}
+.ins-g:not([open])>summary:after{transform:rotate(-90deg)}
+.ins-list{display:flex;flex-direction:column;gap:8px;padding:0 0 12px}
+.ins-row{border-left:3px solid var(--ins-br);padding:2px 0 2px 10px;font-size:15px;line-height:1.35}
+.ins-row small{display:block;color:var(--soft);font-size:12px;margin-top:2px}
+.ins-more>summary{cursor:pointer;color:var(--soft);font-size:13.5px;list-style:none;padding:2px 0 2px 13px}
+.ins-more[open]>summary{display:none}
+.ins-more .ins-row+.ins-row,.ins-more summary+.ins-row{margin-top:8px}
 .calarw svg{width:19px;height:19px}
 #title{cursor:pointer}
 .hs-hint{font-size:13px;color:var(--soft);text-align:center;margin:-3px 0 -4px}
@@ -456,8 +478,9 @@ input::placeholder{color:var(--soft)}
 
   <div class="composer" id="composer">
     <input id="draft" placeholder="Запиши свою победу" autocomplete="off">
-    <div class="hs-hint">в какую сферу?</div>
+    <div class="hs-hint" id="chint">в какую сферу?</div>
     <div class="cats" id="cats"></div>
+    <div class="supertog" id="supertog"><span>⭐ Это суперпобеда дня</span><small id="superhint"></small><i class="sw"></i></div>
     <div class="crow">
       <button class="ok" id="save">Сохранить</button>
       <button class="no" id="cancel">Отмена</button>
@@ -481,11 +504,10 @@ input::placeholder{color:var(--soft)}
       Добавить привычку
     </button>
     </div>
-    <button class="mid" id="superbtn">
-      <svg viewBox="0 0 24 24" fill="#ffd93d" stroke="#c99700" stroke-width="1.8" stroke-linejoin="round">
-        <path d="M12 3l2.9 6.2 6.6.9-4.8 4.6 1.2 6.6L12 18.2 6.1 21.3l1.2-6.6L2.5 10l6.6-.9z"/>
-        <path d="M8 2.5l1 2M16 2.5l-1 2M12 1v1.6" stroke="#c99700" stroke-width="1.6" stroke-linecap="round"/></svg>
-      Добавить суперпобеду
+    <button class="mid ins" id="insightbtn">
+      <svg viewBox="0 0 24 24" fill="#eef1f8" stroke="#7d879e" stroke-width="1.8" stroke-linejoin="round">
+        <path d="M12 2.5Q12.8 11.2 21.5 12Q12.8 12.8 12 21.5Q11.2 12.8 2.5 12Q11.2 11.2 12 2.5Z"/></svg>
+      Добавить инсайт
     </button>
   </div>
 
@@ -530,6 +552,15 @@ function tint(x){ return isDark() ? {c:x.dc, f:x.df} : {c:x.c, f:x.f}; }
 
 const SUPER = '#e8a800';
 const SUPER_FILL = '#ffe04d';
+// инсайт — тоже победа: своя «лунная» звезда с холодным свечением и свои разделы
+const INSIGHT = {c:'#7d879e', f:'#eef1f8', glow:'#b4c2ff', dc:'#d3dbeb', df:'#353a47', dglow:'#aebcff'};
+const INSIGHT_CAT = {id:'инсайт', name:'Инсайты', c:INSIGHT.c, f:INSIGHT.f, dc:INSIGHT.dc, df:INSIGHT.df,
+  ic:'<path d="M12 3Q12.7 11.3 21 12Q12.7 12.7 12 21Q11.3 12.7 3 12Q11.3 11.3 12 3Z"/>'};
+const INSIGHT_SECS = [
+  {id:'жизнь', name:'Жизнь'},
+  {id:'бизнес', name:'Бизнес'},
+  {id:'энергия', name:'Энергия'}
+];
 const PERIODS = [{id:'день',days:1},{id:'3 дня',days:3},{id:'неделя',days:7}];
 const EMPTY_SLOTS = 20;
 
@@ -539,6 +570,7 @@ let period = 0;
 let picked = 'здоровье';
 let editing = null;
 let superMode = false;
+let insightMode = false, pickedSec = 'жизнь';
 let calMonth = startOfDay(new Date());
 let justAdded = null;
 let habits = readHabits();
@@ -572,6 +604,14 @@ function makeDemo(){
       W.push({id:'demo'+i+'_'+j, t:TX[s][j % TX[s].length], s, d:t.toISOString(), synced:true}); }
     if (rnd() < 0.045) { const t = new Date(d); t.setHours(21);
       W.push({id:'demos'+i, t:SUP[Math.floor(rnd() * SUP.length)], s:pick(), d:t.toISOString(), super:true, synced:true}); }
+  }
+  const IT = {'жизнь':['Отдых — часть работы, а не награда за неё','Близким важнее внимание, чем подарки'],
+    'бизнес':['Клиенту важнее скорость, чем цена','Делегировать то, что раздражает','Сначала продажа, потом продукт'],
+    'энергия':['Утро без телефона — день спокойнее','Прогулка после обеда лучше кофе']};
+  let m = 11; const rnd2 = () => (m = (m * 48271) % 2147483647) / 2147483647;
+  for (let i = 120; i >= 0; i--) if (rnd2() < 0.3) {
+    const sec = ['жизнь','бизнес','энергия'][Math.floor(rnd2() * 3)], t = day(i); t.setHours(13);
+    W.push({id:'demoi'+i, t:IT[sec][Math.floor(rnd2() * IT[sec].length)], s:'инсайт', d:t.toISOString(), ins:true, sec, synced:true});
   }
   const H = [
     {id:'dh1', n:'Зарядка', s:'здоровье', start:95, gaps:[]},
@@ -670,6 +710,22 @@ function star(fill, stroke, opts){
   </svg>`;
 }
 
+function insightStar(){
+  const d = isDark(), c = d ? INSIGHT.dc : INSIGHT.c, fc = d ? INSIGHT.dc : '#1c1c1c';
+  const id = 'ig' + Math.random().toString(36).slice(2, 7);
+  return `<svg viewBox="-14 -14 128 128" fill="none">
+    <defs><filter id="${id}" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="6"/></filter></defs>
+    <path d="${STAR_D}" stroke="${d ? INSIGHT.dglow : INSIGHT.glow}" stroke-width="16" stroke-linejoin="round" opacity="${d ? .75 : .9}" filter="url(#${id})"/>
+    <path d="${STAR_D}" fill="${d ? INSIGHT.df : INSIGHT.f}" stroke="${c}" stroke-width="6" stroke-linejoin="round"/>
+    <g stroke="${fc}" stroke-linecap="round" fill="none"><path d="M37 45.5q5-3.4 10 0M53 45.5q5-3.4 10 0" stroke-width="4"/>
+      <path d="M43.5 63.5q6.5 6.5 13 0" stroke-width="4.2"/></g>
+    <circle cx="42.8" cy="55" r="3.8" fill="${fc}"/><circle cx="57.2" cy="55" r="3.8" fill="${fc}"/>
+  </svg>`;
+}
+function insightGroups(list){
+  return INSIGHT_SECS.map(s => ({id: s.id, name: s.name,
+    items: list.filter(w => w.ins && (w.sec || 'жизнь') === s.id).sort((a, b) => new Date(b.d) - new Date(a.d))}));
+}
 function slot(w){
   const i = wins.indexOf(w);
   const c = cat(w.s);
@@ -677,9 +733,10 @@ function slot(w){
   const t = tint(c);
   const hb = w.h ? habits.find(x => x.id === w.h) : null;
   const svg = w.super ? star(SUPER_FILL, SUPER, {super:true})
+            : w.ins ? insightStar()
             : hb ? habitStar(streakOn(hb.id, w.d), cat(hb.s))
             : star(t.f, t.c, {faceColor: isDark() ? t.c : '#1c1c1c'});
-  return `<div class="slot done${w.super?' super':''}${hb?' habit':''}${isNew?' pop':''}" data-edit="${i}">
+  return `<div class="slot done${w.super?' super':''}${hb?' habit':''}${w.ins?' insight':''}${isNew?' pop':''}" data-edit="${i}">
     ${svg}<div class="cap">${esc(hb ? hb.n : w.t)}</div></div>`;
 }
 function emptySlot(){ return `<div class="slot empty">${star('none', isDark() ? '#46443c' : '#c4c2b6', {face:false})}</div>`; }
@@ -939,6 +996,18 @@ function yearHTML(){
     <div class="ylegend">меньше <i class="y0"></i><i class="y1"></i><i class="y2"></i><i class="y3"></i><i class="y4"></i> больше
       <span style="margin-left:8px">— те же пороги, что у шкалы дня</span></div>`;
 }
+function insightsHTML(cur, label){
+  const n = cur.filter(w => w.ins).length, all = wins.filter(w => w.ins).length;
+  const row = w => { const d = new Date(w.d);
+    return `<div class="ins-row">${esc(w.t)}<small>${d.getDate()} ${MONTHS_GEN[d.getMonth()]} ${d.getFullYear()}</small></div>`; };
+  const body = insightGroups(wins).filter(g => g.items.length).map((g, i) =>
+    `<details class="ins-g"${i ? '' : ' open'}><summary><b>${g.name}</b><span>${g.items.length}</span></summary>
+      <div class="ins-list">${g.items.slice(0, 3).map(row).join('')}
+        ${g.items.length > 3 ? `<details class="ins-more"><summary>ещё ${g.items.length - 3}</summary>${g.items.slice(3).map(row).join('')}</details>` : ''}
+      </div></details>`).join('')
+    || '<p class="muted">Инсайтов пока нет — запиши первый кнопкой «Добавить инсайт».</p>';
+  return `<section class="st-sec"><h3>Инсайты <small>${n} ${label} · всего ${all}</small></h3>${body}</section>`;
+}
 function statsHTML(){
   const r = periodRanges(), cur = winsIn(r.a, r.b), prev = winsIn(r.pa, r.pb);
   const diff = prev.length ? Math.round((cur.length - prev.length) / prev.length * 100) : null;
@@ -950,7 +1019,7 @@ function statsHTML(){
 
   const by = {};
   cur.forEach(w => { by[w.s] = (by[w.s] || 0) + 1; });
-  const rows = CATS.map(c => ({c, n: by[c.id] || 0})).filter(x => x.n).sort((a, b) => b.n - a.n);
+  const rows = CATS.concat([INSIGHT_CAT]).map(c => ({c, n: by[c.id] || 0})).filter(x => x.n).sort((a, b) => b.n - a.n);
   const max = rows.length ? rows[0].n : 1;
   const bars = rows.map(x => { const t = tint(x.c);
     return `<div class="sbar"><span class="sname">${catIcon(x.c, t.c)}${x.c.name}</span>
@@ -978,6 +1047,7 @@ function statsHTML(){
       <div class="cmp"><span class="big-n">${cur.length}</span><span class="lbl">${winsWord(cur.length)} ${r.cur}</span>${trend}</div></section>
     <section class="st-sec"><h3>Победы по сферам <small>${r.cur}</small></h3>${bars}</section>
     <section class="st-sec"><h3>Привычки</h3><div class="hcards">${hc}</div></section>
+    ${insightsHTML(cur, r.cur)}
     <section class="st-sec"><h3>Год клетками</h3>${yearHTML()}</section>
     <section class="st-sec"><h3>Лента суперпобед</h3><div class="feed">${feed}</div></section>`;
 }
@@ -1047,7 +1117,7 @@ function render(){
     field.innerHTML = h;
   }
 
-  document.getElementById('cats').innerHTML = CATS.map(c=>{
+  document.getElementById('cats').innerHTML = insightMode ? secChips() : CATS.map(c=>{
     const on = picked===c.id, cl = tint(c).c;
     return `<div class="cat${on?' on':''}" data-c="${c.id}"
       style="border-color:${on?cl:'var(--hair)'};${on?'background:'+cl+(isDark()?'26':'14'):''}">
@@ -1056,10 +1126,11 @@ function render(){
       ${c.name}</div>`;
   }).join('');
 
+  updateComposerExtras();
   const solo = period===0;
   const busy = composerOpen() || hsOpen;
   document.getElementById('pair').style.display     = solo && !busy ? '' : 'none';
-  document.getElementById('superbtn').style.display = solo && !busy ? '' : 'none';
+  document.getElementById('insightbtn').style.display = solo && !busy ? '' : 'none';
   renderHabitSheet();
   if (scr) renderScreen();
   if (typeof paintAuth === 'function') paintAuth();
@@ -1074,18 +1145,35 @@ function titleText(){
 }
 function composerOpen(){ return document.getElementById('composer').classList.contains('on'); }
 
-function openComposer(text, tagId, isSuper){
+function secChips(){
+  const col = isDark() ? INSIGHT.dc : INSIGHT.c;
+  return INSIGHT_SECS.map(x => { const on = pickedSec === x.id;
+    return `<div class="cat${on ? ' on' : ''}" data-sec="${x.id}"
+      style="border-color:${on ? col : 'var(--hair)'};${on ? 'background:' + col + (isDark() ? '26' : '14') : ''}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="${col}" stroke-width="2.2" stroke-linejoin="round">${INSIGHT_CAT.ic}</svg>
+      ${x.name}</div>`; }).join('');
+}
+function updateComposerExtras(){
+  document.getElementById('chint').textContent = insightMode ? 'в какой раздел?' : 'в какую сферу?';
+  const tog = document.getElementById('supertog'), k = dayKey(anchor);
+  tog.style.display = insightMode ? 'none' : '';
+  tog.classList.toggle('on', superMode);
+  const other = wins.some((w, i) => w.super && i !== editing && dayKey(w.d) === k);
+  document.getElementById('superhint').textContent = !superMode && other ? 'сегодня уже есть' : '';
+  document.getElementById('draft').placeholder = insightMode ? 'Что понял? Запиши инсайт'
+    : superMode ? 'Запиши суперпобеду дня' : 'Запиши свою победу';
+}
+function openComposer(text, tagId, isSuper, isInsight, sec){
   document.getElementById('composer').classList.add('on');
   document.getElementById('remove').style.display = editing!==null ? '' : 'none';
-  superMode = !!isSuper;
-  document.getElementById('draft').placeholder = superMode
-    ? 'Запиши свою суперпобеду — главное событие дня' : 'Запиши свою победу';
-  if (tagId) picked = tagId;
+  superMode = !!isSuper; insightMode = !!isInsight;
+  if (sec) pickedSec = sec;
+  if (tagId && !insightMode) picked = tagId;
   render();
   const d=document.getElementById('draft'); d.value=text||''; d.focus(); d.select();
 }
 function closeComposer(){
-  editing=null; superMode=false;
+  editing=null; superMode=false; insightMode=false;
   document.getElementById('composer').classList.remove('on');
   document.getElementById('draft').value='';
   render();
@@ -1094,7 +1182,10 @@ function commit(){
   const t=document.getElementById('draft').value.trim();
   if(!t){ closeComposer(); return; }
   if(editing!==null){
-    wins[editing].t=t; wins[editing].s=picked; wins[editing].synced=false;
+    const w = wins[editing];
+    w.t=t; w.synced=false;
+    if (insightMode) { w.sec=pickedSec; }
+    else { w.s=picked; if (superMode) w.super=true; else delete w.super; }
     if (typeof pushWin==='function') pushWin(wins[editing]);
   }
   else {
@@ -1103,8 +1194,9 @@ function commit(){
     const when = new Date(anchor);
     when.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
     const rec={id:(typeof uid==='function'?uid():String(Date.now())),
-               t, s:picked, d:when.toISOString(), synced:false};
-    if(superMode) rec.super=true;
+               t, s:insightMode?'инсайт':picked, d:when.toISOString(), synced:false};
+    if(insightMode){ rec.ins=true; rec.sec=pickedSec; }
+    else if(superMode) rec.super=true;
     wins.push(rec); justAdded=rec.d;
     if (typeof pushWin==='function') pushWin(rec);
     period=0;                      // остаёмся на выбранной дате
@@ -1154,14 +1246,17 @@ document.addEventListener('click', e=>{
   if (e.target.closest('#hsave')) { saveHabitForm(); return; }
   if (e.target.closest('#hback')) { hsMode = 'list'; hsForm = null; render(); return; }
   if (e.target.closest('#hdel')) { archiveHabit(); return; }
+  if (e.target.closest('#supertog')) { superMode = !superMode; render(); document.getElementById('draft').focus(); return; }
+  const sc = e.target.closest('[data-sec]');
+  if (sc) { pickedSec = sc.dataset.sec; render(); document.getElementById('draft').focus(); return; }
   const c=e.target.closest('[data-c]');
   if(c){ picked=c.dataset.c; render(); if(composerOpen()) document.getElementById('draft').focus(); return; }
   const ed=e.target.closest('[data-edit]');
   if(ed){ const i=+ed.dataset.edit;
     if (wins[i] && wins[i].h) { unmarkHabit(i); return; }
-    editing=i; openComposer(wins[editing].t, wins[editing].s, wins[editing].super); return; }
+    editing=i; openComposer(wins[editing].t, wins[editing].s, wins[editing].super, wins[editing].ins, wins[editing].sec); return; }
   if(e.target.closest('#addbtn')){ editing=null; openComposer('',null,false); return; }
-  if(e.target.closest('#superbtn')){ editing=null; openComposer('',null,true); return; }
+  if(e.target.closest('#insightbtn')){ editing=null; openComposer('',null,false,true); return; }
   if(e.target.id==='save') commit();
   if(e.target.id==='cancel') closeComposer();
   if(e.target.id==='remove' && editing!==null){
