@@ -302,14 +302,18 @@ h1{font-size:44px;line-height:1.05;letter-spacing:.5px}
   will-change:transform;opacity:.2;filter:grayscale(1);transition:opacity .35s,filter .35s}
 .drift[hidden],.dcard[hidden]{display:none}
 .drift.lit{opacity:1;filter:none}
-.drift-star{background:none;border:0;padding:0;cursor:pointer;width:64px;height:64px;animation:dbob 6s ease-in-out infinite;transition:transform .25s}
+.drift-star{background:none;border:0;padding:0;cursor:pointer;width:80px;height:80px;animation:dbob 6s ease-in-out infinite;transition:transform .25s}
 .drift.insight .drift-star{animation-delay:-3s}
 .drift.lit .drift-star{transform:scale(1.15);animation-play-state:paused}
-.drift-star svg{width:64px;height:64px;overflow:visible;display:block}
+.drift-star svg{width:80px;height:80px;overflow:visible;display:block}
 .drift-star:focus-visible{outline:3px solid var(--sun2);outline-offset:6px;border-radius:50%}
-.drift-lbl{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;opacity:0;transform:translateY(-4px);transition:.25s;
+.drift-lbl{position:absolute;top:calc(100% + 6px);left:50%;font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;
+  opacity:0;transform:translate(-50%,-4px);transition:opacity .25s,transform .25s;
   pointer-events:none;background:var(--paper);border:2px solid var(--hair);border-radius:12px;padding:2px 9px}
-.drift.lit .drift-lbl{opacity:1;transform:none}
+.drift.lit .drift-lbl{opacity:1;transform:translate(-50%,0)}
+.drift[data-al="l"] .drift-lbl{left:0;transform:translateY(-4px)}
+.drift[data-al="r"] .drift-lbl{left:auto;right:0;transform:translateY(-4px)}
+.drift.lit[data-al="l"] .drift-lbl,.drift.lit[data-al="r"] .drift-lbl{transform:none}
 @keyframes dbob{0%,100%{translate:0 0}50%{translate:0 -6px}}
 .dcard{position:fixed;z-index:41;background:var(--paper);border:2px solid var(--hair);border-radius:18px;padding:13px 16px 12px;
   box-shadow:0 14px 34px var(--shadow);color:var(--ink);animation:dpop .2s ease-out}
@@ -1448,7 +1452,7 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
   if (!saved) { applyTheme(e.matches ? 'dark' : 'light'); render(); }
 });
 // ── боковые поля: приглушённые звёзды летают по прямой и отскакивают от краёв, как заставка; навёл — загорается, нажал — старая суперпобеда или инсайт ──
-const DRIFT_MIN_FIELD = 150, DRIFT_SIZE = 64, DRIFT_SPEED = 40;
+const DRIFT_MIN_FIELD = 150, DRIFT_SIZE = 80, DRIFT_SPEED = 40;
 const drift = {on: false, theme: null, raf: 0, last: 0, stars: [],
   reduce: matchMedia('(prefers-reduced-motion: reduce)').matches};
 // что показать: давно не показанное (неделя), среди них — самое давнее; не одно и то же подряд
@@ -1461,19 +1465,24 @@ function recallPick(list, shown, now, rnd){
   return top[Math.floor((rnd || Math.random)() * top.length)];
 }
 function recallShown(){ try { return JSON.parse(localStorage.getItem('pobedy_recall') || '{}') || {}; } catch(e){ return {}; } }
+// поле — от края окна (без полосы прокрутки) до приложения
 function driftField(side){
-  const r = document.querySelector('.app').getBoundingClientRect();
-  return side === 'left' ? {x0: 0, w: r.left} : {x0: r.right, w: innerWidth - r.right};
+  const r = document.querySelector('.app').getBoundingClientRect(), W = document.documentElement.clientWidth;
+  return side === 'left' ? {x0: 0, w: r.left} : {x0: r.right, w: W - r.right};
 }
 function driftBounds(s){
   const f = driftField(s.side);
-  return {f, minX: 10, maxX: Math.max(10, f.w - DRIFT_SIZE - 10), minY: 14, maxY: Math.max(14, innerHeight - DRIFT_SIZE - 34)};
+  const toWin = 14, toApp = 22, H = document.documentElement.clientHeight;
+  const minX = s.side === 'left' ? toWin : toApp, maxX = f.w - DRIFT_SIZE - (s.side === 'left' ? toApp : toWin);
+  return {f, minX, maxX: Math.max(minX, maxX), minY: 16, maxY: Math.max(16, H - DRIFT_SIZE - 40)};
 }
 function driftPlace(s){
   const b = driftBounds(s);
   if (!s.placed) { s.x = b.minX + Math.random() * (b.maxX - b.minX); s.y = b.minY + Math.random() * (b.maxY - b.minY); s.placed = true; }
   s.x = Math.min(b.maxX, Math.max(b.minX, s.x)); s.y = Math.min(b.maxY, Math.max(b.minY, s.y));
   s.el.style.transform = `translate(${Math.round(b.f.x0 + s.x)}px, ${Math.round(s.y)}px)`;
+  const cx = s.x + DRIFT_SIZE / 2, half = 95;
+  s.el.dataset.al = cx - half < 8 ? 'l' : cx + half > b.f.w - 8 ? 'r' : 'c';
 }
 function driftStep(t){
   drift.raf = 0;
