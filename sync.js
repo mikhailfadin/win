@@ -58,14 +58,28 @@ async function firstSync(){
   syncing = false; paintAuth(); render();
 }
 
+// Supabase отдаёт не больше 1000 строк за запрос — забираем страницами,
+// иначе после тысячной победы старые перестанут подгружаться (и пропадут с экрана)
+async function fetchAll(table, col){
+  const page = 500, out = [];
+  for (let from = 0; ; from += page) {
+    const r = await sb.from(table).select('*')
+      .order(col, { ascending: true }).order('id', { ascending: true })
+      .range(from, from + page - 1);
+    if (r.error) return { error: r.error, data: null };
+    out.push(...(r.data || []));
+    if (!r.data || r.data.length < page) return { error: null, data: out };
+  }
+}
+
 async function pullAll(){
-  const hr = await sb.from('habits').select('*').order('created_at', { ascending: true });
+  const hr = await fetchAll('habits', 'created_at');
   if (!hr.error && hr.data) {
     const pending = habits.filter(h => !h.synced && !hr.data.some(r => r.id === h.id));
     habits = hr.data.map(habitFrom).concat(pending);
     saveHabits();
   }
-  const wr = await sb.from('wins').select('*').order('happened_at', { ascending: true });
+  const wr = await fetchAll('wins', 'happened_at');
   if (!wr.error && wr.data) {
     const pending = wins.filter(w => !w.synced && !wr.data.some(r => r.id === w.id));
     wins = wr.data.map(winFrom).concat(pending);
